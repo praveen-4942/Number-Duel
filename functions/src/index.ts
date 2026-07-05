@@ -48,6 +48,8 @@ type PrivateRoom = {
 type GuessRecord = {
   id: string;
   guess: string;
+  ownerUid?: string;
+  ownerName?: string;
   correctDigits?: number;
   correctPositions?: number;
   bulls?: number;
