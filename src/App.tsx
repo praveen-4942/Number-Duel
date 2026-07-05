@@ -335,7 +335,7 @@ function Home({
                 Use the panel to create a new room, join an existing duel, or spectate a match. Keep the interface minimal and get into the game fast.
               </p>
             </div>
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid grid-cols-2 gap-3">
               <div className="glass rounded-[2rem] p-6">
                 <div className="text-sm uppercase tracking-[0.28em] text-cyan-200/70">Ready in seconds</div>
                 <div className="mt-3 text-2xl font-black text-white light:text-slate-950">Fast entry</div>
@@ -538,13 +538,13 @@ function RoomHeader({
 
   return (
     <header className="glass sticky top-3 z-30 mx-auto mt-3 w-[calc(100%-1.5rem)] max-w-7xl rounded-2xl px-4 py-3">
-      <div className="flex justify-end">
+      <div className="flex items-center justify-start gap-3">
         <motion.button
           type="button"
           whileTap={{ scale: 0.96 }}
           onClick={() => setDetailsOpen((value) => !value)}
           className="focus-ring rounded-lg border border-white/15 bg-white/10 p-3 text-slate-950 backdrop-blur light:border-slate-900/10 light:bg-white/75"
-          aria-label={detailsOpen ? "Hide room details" : "Show room details"}
+          aria-label={detailsOpen ? "Hide room menu" : "Show room menu"}
         >
           <Menu size={18} />
         </motion.button>
@@ -574,6 +574,9 @@ function RoomHeader({
                   </Button>
                   <Button type="button" variant="ghost" onClick={shareRoom}>
                     <Share2 size={17} /> Share
+                  </Button>
+                  <Button type="button" variant="danger" onClick={onExit}>
+                    <DoorOpen size={17} /> Exit
                   </Button>
                 </div>
               </div>
@@ -645,9 +648,8 @@ function History({ myRecords, opponentRecords, opponentName, meName }: {
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-3">
-          <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-[0.18em] text-slate-400 light:text-slate-600">
-            <span>{meName}</span>
-            <span className="inline-flex rounded-full bg-cyan-500/10 px-2 py-1 text-[10px] uppercase tracking-[0.24em] text-cyan-200">Your guesses</span>
+          <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400 light:text-slate-600">
+            {meName}
           </div>
           {myRecords.length === 0 ? (
             <div className="rounded-lg border border-dashed border-white/15 p-6 text-center text-sm font-semibold text-slate-400 light:border-slate-900/15">
@@ -665,9 +667,6 @@ function History({ myRecords, opponentRecords, opponentName, meName }: {
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                       <div className="font-mono text-base font-semibold text-cyan-100 light:text-cyan-800">{record.guess}</div>
-                      <div className="mt-1 inline-flex rounded-full bg-cyan-500/10 px-2 py-1 text-[9px] uppercase tracking-[0.16em] text-cyan-200">
-                        {record.owner}
-                      </div>
                     </div>
                     <div className="text-[9px] uppercase tracking-[0.18em] text-slate-300 light:text-slate-600">Round {record.round}</div>
                   </div>
@@ -681,7 +680,6 @@ function History({ myRecords, opponentRecords, opponentName, meName }: {
         <div className="space-y-3">
           <div className="flex items-center justify-between text-sm font-semibold uppercase tracking-[0.24em] text-slate-400 light:text-slate-600">
             <span>{opponentName}</span>
-            <span className="inline-flex rounded-full bg-fuchsia-500/10 px-2 py-1 text-[10px] uppercase tracking-[0.24em] text-fuchsia-200">Their guesses</span>
           </div>
           {opponentRecords.length === 0 ? (
             <div className="rounded-lg border border-dashed border-white/15 p-6 text-center text-sm font-semibold text-slate-400 light:border-slate-900/15">
@@ -699,9 +697,6 @@ function History({ myRecords, opponentRecords, opponentName, meName }: {
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                       <div className="font-mono text-base font-semibold text-cyan-100 light:text-cyan-800">{record.guess}</div>
-                      <div className="mt-1 inline-flex rounded-full bg-fuchsia-500/10 px-2 py-1 text-[9px] uppercase tracking-[0.16em] text-fuchsia-200">
-                        {record.owner}
-                      </div>
                     </div>
                     <div className="text-[9px] uppercase tracking-[0.18em] text-slate-300 light:text-slate-600">Round {record.round}</div>
                   </div>
@@ -811,9 +806,8 @@ function GamePanel({
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
           <div>
             <div className="text-sm font-bold uppercase tracking-[0.22em] text-slate-400 light:text-slate-600">Round {room.round}</div>
-            <h2 className="text-2xl font-black">{room.status === "finished" ? "Duel complete" : canGuess ? "Your turn" : role === "spectator" ? "Spectating" : "Opponent turn"}</h2>
+            {room.status === "finished" ? <h2 className="text-2xl font-black">Duel complete</h2> : null}
           </div>
-          <Countdown room={room} active={canGuess} />
         </div>
 
         {room.status === "finished" ? (
@@ -987,12 +981,6 @@ function RoomView({
                   <div className="text-xs font-bold uppercase tracking-[0.18em] text-slate-400">Digits</div>
                   <div className="font-mono text-xl font-black">{room.settings.numberLength}</div>
                 </div>
-              </div>
-              <div className="rounded-lg border border-white/10 bg-white/6 p-3 light:border-slate-900/10 light:bg-white/65">
-                <div className="flex items-center gap-2 text-sm font-black">
-                  <Clock3 size={16} /> Current turn
-                </div>
-                <div className="mt-1 text-2xl font-black">{room.players[room.currentTurnUid ?? ""]?.name ?? "Waiting"}</div>
               </div>
               {opponentOffline && room.status === "playing" ? (
                 <div className="rounded-lg border border-rose-300/25 bg-rose-500/10 p-3 text-sm font-bold text-rose-200 light:text-rose-700">
