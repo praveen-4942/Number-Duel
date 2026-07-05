@@ -40,8 +40,6 @@ const defaultSettings: GameSettings = {
   allowSpectators: true
 };
 
-const reactions = ["🔥", "⚡", "😎", "🎯", "🤯", "👀", "👏", "💫"];
-
 function cx(...classes: Array<string | false | undefined>) {
   return classes.filter(Boolean).join(" ");
 }
@@ -576,7 +574,7 @@ function RoomHeader({
               <div className="grid gap-2 sm:grid-cols-2">
                 <div className="rounded-2xl bg-black/10 p-3 light:bg-slate-100">
                   <div className="text-xs uppercase tracking-[0.18em] text-slate-500 light:text-slate-600">Latency</div>
-                  <div className="font-black text-white light:text-slate-950">{latency ?? "--"} ms</div>
+                  <div className="font-bold text-white light:text-slate-950">{latency ?? "--"} ms</div>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   <Button type="button" variant="ghost" onClick={copyCode}>
@@ -674,14 +672,14 @@ function History({ myRecords, opponentRecords, opponentName, meName }: {
                 >
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                      <div className="font-mono text-xl font-black text-cyan-100 light:text-cyan-800">{record.guess}</div>
+                      <div className="font-mono text-lg font-bold text-cyan-100 light:text-cyan-800">{record.guess}</div>
                       <div className="mt-2 inline-flex rounded-full bg-cyan-500/10 px-2 py-1 text-[10px] uppercase tracking-[0.2em] text-cyan-200">
                         {record.owner}
                       </div>
                     </div>
-                    <div className="text-[10px] uppercase tracking-[0.26em] text-slate-300 light:text-slate-600">Round {record.round}</div>
+                    <div className="text-[11px] uppercase tracking-[0.26em] text-slate-300 light:text-slate-600">Round {record.round}</div>
                   </div>
-                  <div className="mt-2 text-sm font-bold text-slate-100 light:text-slate-900">{clueLabel(record)}</div>
+                  <div className="mt-2 text-sm font-semibold text-slate-100 light:text-slate-900">{clueLabel(record)}</div>
                 </motion.div>
               ))}
             </div>
@@ -815,10 +813,6 @@ function GamePanel({
     }
   }
 
-  async function react(emoji: string) {
-    await api.sendReaction({ roomCode: room.roomCode, emoji });
-  }
-
   return (
     <div className="glass relative min-h-[60vh] sm:min-h-[calc(100vh-16rem)] flex flex-col gap-4 rounded-2xl p-5 pb-32 overflow-hidden">
       <div className="grid gap-5 pb-28 sm:pb-0">
@@ -887,21 +881,10 @@ function GamePanel({
                 {busy ? <Loader2 className="animate-spin" size={18} /> : <Send size={18} />} Guess
               </Button>
             </div>
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div className="text-sm font-semibold text-slate-400 light:text-slate-600">
-                {room.settings.clueMode === "classic"
-                  ? "Classic: Correct Positions only"
-                  : room.settings.clueMode === "advanced"
-                  ? "Advanced: Correct Digits and Correct Positions"
-                  : "Bulls & Cows: Bulls are exact, cows are wrong-position digits"}
-              </div>
-              <div className="flex gap-1">
-                {reactions.map((emoji) => (
-                  <button key={emoji} type="button" onClick={() => react(emoji)} className="focus-ring rounded-lg bg-white/8 px-2 py-1 text-xl transition hover:bg-white/15">
-                    {emoji}
-                  </button>
-                ))}
-              </div>
+            <div className="text-sm font-semibold text-slate-400 light:text-slate-600">
+              {room.settings.clueMode === "classic"
+                ? "Classic: Correct Positions only"
+                : "Advanced: Correct Digits and Correct Positions"}
             </div>
             {error || guessError ? (
               <div className="rounded-lg bg-rose-500/10 p-3 text-sm font-bold text-rose-200 light:text-rose-700">{error || guessError}</div>
@@ -909,43 +892,6 @@ function GamePanel({
           </form>
         )}
       </div>
-    </div>
-  );
-}
-
-function FloatingReactions({ room }: { room: PublicRoom }) {
-  const [now, setNow] = useState(Date.now());
-
-  useEffect(() => {
-    const id = window.setInterval(() => setNow(Date.now()), 1000);
-    return () => window.clearInterval(id);
-  }, []);
-
-  const list = useMemo(
-    () =>
-      Object.entries(room.reactions ?? {})
-        .map(([id, reaction]) => ({ id, reaction }))
-        .filter(({ reaction }) => reaction.createdAt > now - 4000)
-        .sort((a, b) => a.reaction.createdAt - b.reaction.createdAt)
-        .slice(-5),
-    [room.reactions, now]
-  );
-
-  return (
-    <div className="pointer-events-none fixed inset-x-0 bottom-8 z-40 hidden justify-center sm:flex">
-      <AnimatePresence>
-        {list.map(({ id, reaction }, index) => (
-          <motion.div
-            key={id}
-            initial={{ opacity: 0, y: 30, scale: 0.8 }}
-            animate={{ opacity: 1, y: -index * 18, scale: 1 }}
-            exit={{ opacity: 0, y: -60 }}
-            className="absolute rounded-full bg-white/12 px-4 py-2 text-3xl backdrop-blur"
-          >
-            {reaction.emoji}
-          </motion.div>
-        ))}
-      </AnimatePresence>
     </div>
   );
 }
@@ -1043,7 +989,7 @@ function RoomView({
               <div className="grid grid-cols-2 gap-3">
                 <div className="rounded-lg bg-white/6 p-3 light:bg-white/65">
                   <div className="text-xs font-bold uppercase tracking-[0.18em] text-slate-400">Mode</div>
-                  <div className="font-black">{room.settings.clueMode === "bullsCows" ? "Bulls & Cows" : room.settings.clueMode}</div>
+                  <div className="font-black">{room.settings.clueMode === "classic" ? "Classic" : "Advanced"}</div>
                 </div>
                 <div className="rounded-lg bg-white/6 p-3 light:bg-white/65">
                   <div className="text-xs font-bold uppercase tracking-[0.18em] text-slate-400">Digits</div>
@@ -1088,7 +1034,6 @@ function RoomView({
 
         <GamePanel room={room} uid={uid} myRecords={myRecords} opponentRecords={opponentRecords} role={role} />
       </main>
-      <FloatingReactions room={room} />
     </>
   );
 }
