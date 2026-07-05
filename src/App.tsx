@@ -538,24 +538,16 @@ function RoomHeader({
 
   return (
     <header className="glass sticky top-3 z-30 mx-auto mt-3 w-[calc(100%-1.5rem)] max-w-7xl rounded-2xl px-4 py-3">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <div className="rounded-lg bg-cyan-300 p-2 text-slate-950 shadow-glow">
-            <Gamepad2 size={22} />
-          </div>
-          <div>
-            <div className="text-xs font-bold uppercase tracking-[0.28em] text-slate-400 light:text-slate-600">Duel Info</div>
-            <div className="text-lg font-black text-white light:text-slate-950">Room details are hidden</div>
-          </div>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <Button type="button" variant="ghost" onClick={() => setDetailsOpen((value) => !value)}>
-            <Menu size={17} /> {detailsOpen ? "Hide details" : "Menu"}
-          </Button>
-          <Button type="button" variant="danger" onClick={onExit}>
-            <DoorOpen size={17} /> Exit
-          </Button>
-        </div>
+      <div className="flex justify-end">
+        <motion.button
+          type="button"
+          whileTap={{ scale: 0.96 }}
+          onClick={() => setDetailsOpen((value) => !value)}
+          className="focus-ring rounded-lg border border-white/15 bg-white/10 p-3 text-slate-950 backdrop-blur light:border-slate-900/10 light:bg-white/75"
+          aria-label={detailsOpen ? "Hide room details" : "Show room details"}
+        >
+          <Menu size={18} />
+        </motion.button>
       </div>
 
       <AnimatePresence>
@@ -621,14 +613,14 @@ function PlayerTile({
           </div>
         </div>
       </div>
-      <div className="mt-4 grid grid-cols-2 gap-2 text-sm">
-        <div className="rounded-lg bg-black/18 p-3 light:bg-white/60">
+      <div className="mt-4 grid grid-cols-2 gap-2 text-[10px]">
+        <div className="rounded-lg bg-black/18 p-2 light:bg-white/60">
           <div className="text-slate-400 light:text-slate-600">Wins</div>
-          <div className="font-mono text-xl font-black">{player?.wins ?? 0}</div>
+          <div className="font-mono text-base font-black">{player?.wins ?? 0}</div>
         </div>
-        <div className="rounded-lg bg-black/18 p-3 light:bg-white/60">
+        <div className="rounded-lg bg-black/18 p-2 light:bg-white/60">
           <div className="text-slate-400 light:text-slate-600">Losses</div>
-          <div className="font-mono text-xl font-black">{player?.losses ?? 0}</div>
+          <div className="font-mono text-base font-black">{player?.losses ?? 0}</div>
         </div>
       </div>
       {winner ? <div className="mt-3 inline-flex items-center gap-2 text-sm font-black text-amber-200 light:text-amber-700"><Trophy size={16} /> Winner</div> : null}
@@ -651,9 +643,9 @@ function History({ myRecords, opponentRecords, opponentName, meName }: {
         </div>
         <Clipboard className="text-cyan-200 light:text-cyan-700" size={20} />
       </div>
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid grid-cols-2 gap-3">
         <div className="space-y-3">
-          <div className="flex items-center justify-between text-sm font-semibold uppercase tracking-[0.24em] text-slate-400 light:text-slate-600">
+          <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-[0.18em] text-slate-400 light:text-slate-600">
             <span>{meName}</span>
             <span className="inline-flex rounded-full bg-cyan-500/10 px-2 py-1 text-[10px] uppercase tracking-[0.24em] text-cyan-200">Your guesses</span>
           </div>
@@ -672,14 +664,14 @@ function History({ myRecords, opponentRecords, opponentName, meName }: {
                 >
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                      <div className="font-mono text-lg font-bold text-cyan-100 light:text-cyan-800">{record.guess}</div>
-                      <div className="mt-2 inline-flex rounded-full bg-cyan-500/10 px-2 py-1 text-[10px] uppercase tracking-[0.2em] text-cyan-200">
+                      <div className="font-mono text-base font-semibold text-cyan-100 light:text-cyan-800">{record.guess}</div>
+                      <div className="mt-1 inline-flex rounded-full bg-cyan-500/10 px-2 py-1 text-[9px] uppercase tracking-[0.16em] text-cyan-200">
                         {record.owner}
                       </div>
                     </div>
-                    <div className="text-[11px] uppercase tracking-[0.26em] text-slate-300 light:text-slate-600">Round {record.round}</div>
+                    <div className="text-[9px] uppercase tracking-[0.18em] text-slate-300 light:text-slate-600">Round {record.round}</div>
                   </div>
-                  <div className="mt-2 text-sm font-semibold text-slate-100 light:text-slate-900">{clueLabel(record)}</div>
+                  <div className="mt-1 text-xs font-semibold text-slate-100 light:text-slate-900">{clueLabel(record)}</div>
                 </motion.div>
               ))}
             </div>
@@ -706,14 +698,14 @@ function History({ myRecords, opponentRecords, opponentName, meName }: {
                 >
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                      <div className="font-mono text-xl font-black text-cyan-100 light:text-cyan-800">{record.guess}</div>
-                      <div className="mt-2 inline-flex rounded-full bg-fuchsia-500/10 px-2 py-1 text-[10px] uppercase tracking-[0.2em] text-fuchsia-200">
+                      <div className="font-mono text-base font-semibold text-cyan-100 light:text-cyan-800">{record.guess}</div>
+                      <div className="mt-1 inline-flex rounded-full bg-fuchsia-500/10 px-2 py-1 text-[9px] uppercase tracking-[0.16em] text-fuchsia-200">
                         {record.owner}
                       </div>
                     </div>
-                    <div className="text-[10px] uppercase tracking-[0.26em] text-slate-300 light:text-slate-600">Round {record.round}</div>
+                    <div className="text-[9px] uppercase tracking-[0.18em] text-slate-300 light:text-slate-600">Round {record.round}</div>
                   </div>
-                  <div className="mt-2 text-sm font-bold text-slate-100 light:text-slate-900">{clueLabel(record)}</div>
+                  <div className="mt-1 text-xs font-semibold text-slate-100 light:text-slate-900">{clueLabel(record)}</div>
                 </motion.div>
               ))}
             </div>
@@ -1019,16 +1011,18 @@ function RoomView({
             <div className="flex items-center gap-2 text-sm font-black uppercase tracking-[0.2em] text-slate-400">
               <Users size={17} /> Players
             </div>
-            {players.map((player) => (
-              <PlayerTile
-                key={player.uid}
-                player={player}
-                active={room.currentTurnUid === player.uid}
-                online={presence[player.uid]?.online ?? player.connected}
-                winner={room.winnerUid === player.uid}
-              />
-            ))}
-            {players.length < 2 ? <PlayerTile online={false} /> : null}
+            <div className="grid grid-cols-2 gap-3">
+              {players.map((player) => (
+                <PlayerTile
+                  key={player.uid}
+                  player={player}
+                  active={room.currentTurnUid === player.uid}
+                  online={presence[player.uid]?.online ?? player.connected}
+                  winner={room.winnerUid === player.uid}
+                />
+              ))}
+              {players.length < 2 ? <PlayerTile online={false} /> : null}
+            </div>
           </div>
         </section>
 
