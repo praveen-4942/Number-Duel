@@ -191,163 +191,267 @@ function Home({
     }
   }
 
-  return (
-    <main className="mx-auto flex min-h-screen w-full max-w-7xl items-center px-4 py-20 sm:px-6 lg:px-8">
-      <div className="grid w-full gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
-        <motion.section
-          initial={{ opacity: 0, scale: 0.96, y: 26 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          transition={{ duration: 0.9, ease: "easeOut" }}
-          className="space-y-8"
-        >
-          <div className="inline-flex items-center gap-2 rounded-full border border-cyan-300/30 bg-cyan-300/10 px-4 py-2 text-sm font-bold text-cyan-100 shadow-[0_0_30px_rgba(45,232,255,0.18)] light:text-cyan-800">
-            <Radio size={16} /> Real-time two-player duel
-          </div>
-          <div className="space-y-5">
-            <h1 className="max-w-3xl text-5xl font-black tracking-normal sm:text-6xl lg:text-7xl">
-              <span className="block text-white">Number</span>
-              <span className="block text-6xl font-extrabold tracking-[-0.04em] text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-fuchsia-300 to-amber-300 sm:text-7xl lg:text-8xl">
-                Duel
-              </span>
-            </h1>
-            <p className="max-w-2xl text-lg leading-8 text-slate-300 light:text-slate-700">
-              Enter the arena, lock your secret code, and challenge another player in a glowing numbers battle.
-            </p>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-3">
-            {[
-              { label: "Server scored", Icon: ShieldCheck },
-              { label: "Private histories", Icon: Eye },
-              { label: "60s reconnect", Icon: Wifi }
-            ].map(({ label, Icon }) => (
-              <motion.div
-                key={label}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.55, ease: "easeOut" }}
-                className="glass rounded-3xl p-6 shadow-[0_25px_80px_rgba(3,236,255,0.12)]"
-              >
-                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-3xl bg-gradient-to-br from-cyan-400/25 to-fuchsia-400/15 text-cyan-200 shadow-[0_0_25px_rgba(67,206,255,0.24)]">
-                  <Icon size={22} />
-                </div>
-                <div className="text-lg font-black text-white">{label}</div>
-              </motion.div>
-            ))}
-          </div>
-        </motion.section>
+  const scrollToSection = (id: string) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
 
-        <motion.form
-          initial={{ opacity: 0, scale: 0.95, y: 24 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          transition={{ duration: 0.75, ease: "easeOut" }}
-          onSubmit={submit}
-          className="glass rounded-[2.5rem] border-cyan-300/20 p-5 shadow-[0_30px_90px_rgba(20,58,127,0.35)] sm:p-6"
-        >
-          <div className="mb-5 grid grid-cols-3 gap-2 rounded-[1.75rem] bg-black/20 p-1 shadow-[inset_0_0_1px_rgba(255,255,255,0.08)] light:bg-white/60">
-            {(["create", "join", "spectate"] as const).map((item) => (
+  return (
+    <>
+      <motion.header
+        initial={{ opacity: 0, y: -12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="sticky top-0 z-40 border-b border-white/10 bg-slate-950/90 backdrop-blur-xl"
+      >
+        <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+          <div className="flex items-center gap-3">
+            <div className="grid h-12 w-12 place-items-center rounded-3xl bg-gradient-to-br from-cyan-400/20 to-fuchsia-400/10 text-cyan-200 shadow-[0_0_18px_rgba(67,206,255,0.2)]">
+              <Gamepad2 size={22} />
+            </div>
+            <div>
+              <div className="text-xs uppercase tracking-[0.32em] text-cyan-300/80">Number Duel</div>
+              <div className="text-lg font-black text-white">Arena Menu</div>
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-2 sm:justify-end">
+            {[
+              { label: "Home", id: "home" },
+              { label: "Play", id: "play" },
+              { label: "Rule Book", id: "rule-book" }
+            ].map((item) => (
               <button
-                key={item}
+                key={item.id}
                 type="button"
-                onClick={() => setTab(item)}
-                className={cx(
-                  "focus-ring rounded-[1.25rem] px-4 py-3 text-sm font-black uppercase tracking-[0.12em] transition duration-200",
-                  tab === item
-                    ? "bg-gradient-to-r from-cyan-300 via-fuchsia-300 to-amber-300 text-slate-950 shadow-[0_0_30px_rgba(67,206,255,0.2)]"
-                    : "text-slate-300 hover:bg-white/10 light:text-slate-700"
-                )}
+                onClick={() => scrollToSection(item.id)}
+                className="focus-ring rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:border-cyan-300/40 hover:bg-white/10"
               >
-                {item}
+                {item.label}
               </button>
             ))}
           </div>
+        </div>
+      </motion.header>
 
-          <div className="grid gap-4">
-            {tab !== "spectate" ? <Field label="Player name" value={name} onChange={(e) => setName(e.target.value)} maxLength={20} required /> : null}
-            {tab !== "create" ? (
-              <Field
-                label="Room code"
-                value={roomCode}
-                onChange={(e) => setRoomCode(e.target.value.toUpperCase().slice(0, 6))}
-                maxLength={6}
-                required
-              />
-            ) : null}
+      <main className="mx-auto w-full max-w-7xl space-y-12 px-4 py-16 sm:space-y-16 sm:px-6 lg:px-8">
+        <section id="home" className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+          <motion.div
+            initial={{ opacity: 0, x: -24 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.75, ease: "easeOut" }}
+            className="space-y-6"
+          >
+            <div className="inline-flex items-center gap-2 rounded-full border border-cyan-300/25 bg-cyan-300/10 px-4 py-2 text-sm font-bold text-cyan-100 shadow-[0_0_30px_rgba(67,206,255,0.16)]">
+              <Radio size={16} /> Next-level number duels
+            </div>
+            <div className="space-y-5">
+              <h1 className="text-5xl font-black tracking-[-0.04em] text-white sm:text-6xl lg:text-7xl">
+                Simplified arena launch.
+              </h1>
+              <p className="max-w-2xl text-lg leading-8 text-slate-300">
+                This home page now keeps only the essentials: a clean entry, quick actions, and direct navigation to the game and rule book.
+              </p>
+            </div>
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <Button type="button" variant="primary" className="w-full rounded-full sm:w-auto" onClick={() => scrollToSection("play")}>Enter the arena</Button>
+              <Button type="button" variant="ghost" className="w-full rounded-full sm:w-auto" onClick={() => scrollToSection("rule-book")}>View rule book</Button>
+            </div>
+          </motion.div>
 
-            {tab === "create" ? (
-              <>
-                <div className="grid gap-2">
-                  <span className="text-sm font-semibold text-slate-200 light:text-slate-800">Number length</span>
-                  <Segmented
-                    value={settings.numberLength}
-                    options={[3, 4, 5, 6].map((value) => ({ label: `${value}`, value: value as 3 | 4 | 5 | 6 }))}
-                    onChange={(numberLength) => setSettings((current) => ({ ...current, numberLength }))}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <span className="text-sm font-semibold text-slate-200 light:text-slate-800">Clue mode</span>
-                  <Segmented<ClueMode>
-                    value={settings.clueMode}
-                    options={[
-                      { label: "Classic", value: "classic" },
-                      { label: "Advanced", value: "advanced" },
-                      { label: "Bulls & Cows", value: "bullsCows" }
-                    ]}
-                    onChange={(clueMode) => setSettings((current) => ({ ...current, clueMode }))}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <span className="text-sm font-semibold text-slate-200 light:text-slate-800">Turn timer</span>
-                  <Segmented
-                    value={settings.timerSeconds}
-                    options={[
-                      { label: "Off", value: 0 },
-                      { label: "30s", value: 30 },
-                      { label: "45s", value: 45 },
-                      { label: "60s", value: 60 },
-                      { label: "90s", value: 90 }
-                    ]}
-                    onChange={(timerSeconds) => setSettings((current) => ({ ...current, timerSeconds }))}
-                  />
-                </div>
-                <label className="flex items-center justify-between rounded-lg border border-white/10 bg-white/5 p-3 text-sm font-bold light:border-slate-900/10 light:bg-white/65">
-                  Spectator mode
-                  <input
-                    type="checkbox"
-                    checked={settings.allowSpectators}
-                    onChange={(e) => setSettings((current) => ({ ...current, allowSpectators: e.target.checked }))}
-                    className="h-5 w-5 accent-cyan-300"
-                  />
-                </label>
-              </>
-            ) : null}
+          <motion.div
+            initial={{ opacity: 0, x: 24 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.75, ease: "easeOut" }}
+            className="grid gap-4"
+          >
+            {[
+              { title: "Fast Setup", text: "Create or join a room instantly with a clean play panel." },
+              { title: "Hidden Secrets", text: "Your number stays private while clues reveal the game." },
+              { title: "Rule Book", text: "Everything you need to know is available in the menu." }
+            ].map((item) => (
+              <div key={item.title} className="glass rounded-[2rem] p-6 shadow-[0_30px_90px_rgba(2,26,57,0.35)]">
+                <div className="text-sm uppercase tracking-[0.28em] text-cyan-200/70">{item.title}</div>
+                <p className="mt-3 text-slate-300">{item.text}</p>
+              </div>
+            ))}
+          </motion.div>
+        </section>
 
-            {tab !== "spectate" ? (
-              <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
+        <section id="play" className="grid gap-8 lg:grid-cols-[0.95fr_1fr] lg:items-start">
+          <div className="space-y-6">
+            <div className="rounded-[2rem] border border-white/10 bg-slate-950/85 p-8 shadow-[0_30px_90px_rgba(2,26,57,0.35)]">
+              <div className="text-sm uppercase tracking-[0.32em] text-cyan-300/70">Quick Start</div>
+              <h2 className="mt-3 text-3xl font-black text-white">Pick your path</h2>
+              <p className="mt-4 max-w-2xl text-slate-300">
+                Use the panel to create a new room, join an existing duel, or spectate a match. Keep the interface minimal and get into the game fast.
+              </p>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="glass rounded-[2rem] p-6">
+                <div className="text-sm uppercase tracking-[0.28em] text-cyan-200/70">Ready in seconds</div>
+                <div className="mt-3 text-2xl font-black text-white">Fast entry</div>
+              </div>
+              <div className="glass rounded-[2rem] p-6">
+                <div className="text-sm uppercase tracking-[0.28em] text-cyan-200/70">Secure play</div>
+                <div className="mt-3 text-2xl font-black text-white">Server-validated secrets</div>
+              </div>
+            </div>
+          </div>
+
+          <motion.form
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.75, ease: "easeOut" }}
+            onSubmit={submit}
+            className="glass rounded-[2.5rem] border border-cyan-300/20 p-6 shadow-[0_30px_90px_rgba(20,58,127,0.35)]"
+          >
+            <div className="mb-5 grid grid-cols-1 gap-2 rounded-[1.75rem] bg-slate-900/80 p-1 shadow-[inset_0_0_1px_rgba(255,255,255,0.06)] sm:grid-cols-3">
+              {(["create", "join", "spectate"] as const).map((item) => (
+                <button
+                  key={item}
+                  type="button"
+                  onClick={() => setTab(item)}
+                  className={cx(
+                    "focus-ring rounded-[1.25rem] px-4 py-3 text-sm font-black uppercase tracking-[0.12em] transition duration-200",
+                    tab === item
+                      ? "bg-gradient-to-r from-cyan-300 via-fuchsia-300 to-amber-300 text-slate-950 shadow-[0_0_30px_rgba(67,206,255,0.2)]"
+                      : "text-slate-300 hover:bg-white/10"
+                  )}
+                >
+                  {item}
+                </button>
+              ))}
+            </div>
+
+            <div className="space-y-4">
+              {tab !== "spectate" ? <Field label="Player name" value={name} onChange={(e) => setName(e.target.value)} maxLength={20} required /> : null}
+              {tab !== "create" ? (
                 <Field
-                  label={`Secret number (${settings.numberLength} unique digits)`}
-                  value={secret}
-                  onChange={(e) => setSecret(e.target.value.replace(/\D/g, "").slice(0, settings.numberLength))}
-                  inputMode="numeric"
-                  autoComplete="off"
-                  error={secret ? secretError : ""}
+                  label="Room code"
+                  value={roomCode}
+                  onChange={(e) => setRoomCode(e.target.value.toUpperCase().slice(0, 6))}
+                  maxLength={6}
                   required
                 />
-                <Button type="button" variant="ghost" className="self-end" onClick={() => setSecret(generateSecret(settings.numberLength))}>
-                  <Sparkles size={18} /> Random
-                </Button>
+              ) : null}
+
+              {tab === "create" ? (
+                <>
+                  <div className="grid gap-4">
+                    <div>
+                      <div className="text-sm font-semibold text-slate-300">Number length</div>
+                      <Segmented
+                        value={settings.numberLength}
+                        options={[3, 4, 5, 6].map((value) => ({ label: `${value}`, value: value as 3 | 4 | 5 | 6 }))}
+                        onChange={(numberLength) => setSettings((current) => ({ ...current, numberLength }))}
+                      />
+                    </div>
+                    <div>
+                      <div className="text-sm font-semibold text-slate-300">Clue mode</div>
+                      <Segmented<ClueMode>
+                        value={settings.clueMode}
+                        options={[
+                          { label: "Classic", value: "classic" },
+                          { label: "Advanced", value: "advanced" },
+                          { label: "Bulls & Cows", value: "bullsCows" }
+                        ]}
+                        onChange={(clueMode) => setSettings((current) => ({ ...current, clueMode }))}
+                      />
+                    </div>
+                    <div>
+                      <div className="text-sm font-semibold text-slate-300">Turn timer</div>
+                      <Segmented
+                        value={settings.timerSeconds}
+                        options={[
+                          { label: "Off", value: 0 },
+                          { label: "30s", value: 30 },
+                          { label: "45s", value: 45 },
+                          { label: "60s", value: 60 },
+                          { label: "90s", value: 90 }
+                        ]}
+                        onChange={(timerSeconds) => setSettings((current) => ({ ...current, timerSeconds }))}
+                      />
+                    </div>
+                    <label className="flex items-center justify-between rounded-[1.5rem] border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-slate-200">
+                      Spectator mode
+                      <input
+                        type="checkbox"
+                        checked={settings.allowSpectators}
+                        onChange={(e) => setSettings((current) => ({ ...current, allowSpectators: e.target.checked }))}
+                        className="h-5 w-5 accent-cyan-300"
+                      />
+                    </label>
+                  </div>
+                </>
+              ) : null}
+
+              {tab !== "spectate" ? (
+                <div className="grid gap-3">
+                  <Field
+                    label={`Secret number (${settings.numberLength} unique digits)`}
+                    value={secret}
+                    onChange={(e) => setSecret(e.target.value.replace(/\D/g, "").slice(0, settings.numberLength))}
+                    inputMode="numeric"
+                    autoComplete="off"
+                    error={secret ? secretError : ""}
+                    required
+                  />
+                  <Button type="button" variant="ghost" className="rounded-full" onClick={() => setSecret(generateSecret(settings.numberLength))}>
+                    <Sparkles size={18} /> Random
+                  </Button>
+                </div>
+              ) : null}
+
+              {error ? <div className="rounded-[1.75rem] border border-rose-300/30 bg-rose-500/10 p-4 text-sm font-semibold text-rose-200">{error}</div> : null}
+
+              <Button type="submit" disabled={busy || submitting || (tab !== "spectate" && (!name || !!secretError))} className="w-full rounded-full">
+                {submitting ? <Loader2 className="animate-spin" size={18} /> : <Gamepad2 size={18} />}
+                {tab === "create" ? "Create Room" : tab === "join" ? "Join Room" : "Watch Room"}
+              </Button>
+            </div>
+          </motion.form>
+        </section>
+
+        <section id="rule-book" className="space-y-8">
+          <div className="glass rounded-[2rem] border border-white/10 bg-slate-950/85 p-8 shadow-[0_30px_90px_rgba(2,26,57,0.35)]">
+            <div className="text-sm uppercase tracking-[0.32em] text-cyan-300/70">Rule Book</div>
+            <h2 className="mt-3 text-3xl font-black text-white">All the rules</h2>
+            <div className="mt-8 space-y-6 text-slate-300">
+              <div>
+                <h3 className="text-xl font-bold text-white">Room Creation</h3>
+                <p className="mt-2 leading-7">Choose a name, select a unique secret number, and create a room. Secrets remain hidden on the server, and only safe game state is shared with your opponent.</p>
               </div>
-            ) : null}
-
-            {error ? <div className="rounded-lg border border-rose-300/30 bg-rose-500/10 p-3 text-sm font-semibold text-rose-200 light:text-rose-700">{error}</div> : null}
-
-            <Button type="submit" disabled={busy || submitting || (tab !== "spectate" && (!name || !!secretError))}>
-              {submitting ? <Loader2 className="animate-spin" size={18} /> : <Gamepad2 size={18} />}
-              {tab === "create" ? "Create Room" : tab === "join" ? "Join Room" : "Watch Room"}
-            </Button>
+              <div>
+                <h3 className="text-xl font-bold text-white">Joining & Spectating</h3>
+                <p className="mt-2 leading-7">Enter a room code to join as a player. If spectating is enabled, watch live matches without revealing secrets or histories.</p>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white">Clue Modes</h3>
+                <ul className="mt-3 list-disc space-y-2 pl-5 leading-7 text-slate-300">
+                  <li><span className="font-semibold text-white">Classic:</span> only correct digits in the correct position are shown.</li>
+                  <li><span className="font-semibold text-white">Advanced:</span> both correct digits and correct positions are reported.</li>
+                  <li><span className="font-semibold text-white">Bulls & Cows:</span> bulls and cows are reported separately.</li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white">Turn Flow</h3>
+                <p className="mt-2 leading-7">Players take alternating turns. Each guess is evaluated server-side, and the resulting clue is revealed to the guesser.</p>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white">Winning</h3>
+                <p className="mt-2 leading-7">The first player to correctly guess the opponent’s secret number wins the duel. After completion, players may request a rematch to begin a new game.</p>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white">Reconnect Safety</h3>
+                <p className="mt-2 leading-7">Disconnects are handled gracefully with a 60-second reconnect window. Player secrets remain protected regardless of connection state.</p>
+              </div>
+            </div>
           </div>
-        </motion.form>
-      </div>
-    </main>
+        </section>
+      </main>
+    </>
   );
 }
 
