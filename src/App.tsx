@@ -913,22 +913,39 @@ function RoomView({
   onExit: () => void;
 }) {
   const [sound, setSound] = useState(true);
-  const myRecords = useMemo(() =>
-    orderedHistory(history).map((record) => ({
-      ...record,
-      owner: record.ownerUid === uid ? "You" : me?.name ?? "You",
-      name: record.ownerUid === uid ? me?.name ?? "You" : me?.name ?? "You"
-    })),
-    [history, me, uid]
+  const allRecords = useMemo(() => {
+    const combined = [...orderedHistory(history), ...orderedHistory(opponentHistory)];
+    const seen = new Map<string, GuessRecord>();
+    combined.forEach((record) => {
+      if (!seen.has(record.id)) {
+        seen.set(record.id, record);
+      }
+    });
+    return Array.from(seen.values()).sort((a, b) => b.createdAt - a.createdAt);
+  }, [history, opponentHistory]);
+
+  const myRecords = useMemo(
+    () =>
+      allRecords
+        .filter((record) => record.ownerUid === uid)
+        .map((record) => ({
+          ...record,
+          owner: "You",
+          name: me?.name ?? "You"
+        })),
+    [allRecords, me, uid]
   );
 
-  const opponentRecords = useMemo(() =>
-    orderedHistory(opponentHistory).map((record) => ({
-      ...record,
-      owner: record.ownerUid === uid ? "You" : record.ownerName ?? opponent?.name ?? "Opponent",
-      name: record.ownerUid === uid ? me?.name ?? "You" : record.ownerName ?? opponent?.name ?? "Opponent"
-    })),
-    [opponentHistory, opponent, me, uid]
+  const opponentRecords = useMemo(
+    () =>
+      allRecords
+        .filter((record) => record.ownerUid !== uid)
+        .map((record) => ({
+          ...record,
+          owner: record.ownerName ?? opponent?.name ?? "Opponent",
+          name: record.ownerName ?? opponent?.name ?? "Opponent"
+        })),
+    [allRecords, opponent]
   );
 
   const players = room.playerOrder.map((id) => room.players[id]);
