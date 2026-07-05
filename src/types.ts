@@ -38,6 +38,8 @@ export type PublicRoom = {
 export type GuessRecord = {
   id: string;
   guess: string;
+  ownerUid?: string;
+  ownerName?: string;
   correctDigits?: number;
   correctPositions?: number;
   bulls?: number;

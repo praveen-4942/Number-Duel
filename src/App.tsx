@@ -603,17 +603,17 @@ function History({ records }: { records: Array<GuessRecord & { owner: string; na
         ) : (
           records.map((record) => (
             <motion.div
-              key={`${record.owner}-${record.id}`}
+              key={record.id}
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               className="grid grid-cols-[auto_1fr] gap-3 rounded-lg border border-white/10 bg-white/6 p-3 light:border-slate-900/10 light:bg-white/70"
             >
               <div className="space-y-2">
                 <div className="font-mono text-xl font-black text-cyan-100 light:text-cyan-800">{record.guess}</div>
-                <div className="text-[10px] uppercase tracking-[0.26em] text-slate-400 light:text-slate-600">{record.owner}</div>
+                <div className="text-[10px] uppercase tracking-[0.26em] text-slate-300 light:text-slate-600">{record.owner}</div>
               </div>
               <div className="text-sm">
-                <div className="font-bold text-slate-950 light:text-slate-900">{clueLabel(record)}</div>
+                <div className="font-bold text-slate-100 light:text-slate-900">{clueLabel(record)}</div>
                 <div className="mt-1 text-xs text-slate-400 light:text-slate-600">Round {record.round}</div>
               </div>
             </motion.div>
@@ -865,13 +865,19 @@ function RoomView({
   const [sound, setSound] = useState(true);
   const records = useMemo(() => orderedHistory(history), [history]);
   const opponentRecords = useMemo(() => orderedHistory(opponentHistory), [opponentHistory]);
-  const mergedRecords = useMemo(
-    () =>
-      [...records.map((record) => ({ ...record, owner: "You", name: me?.name ?? "You" })),
-      ...opponentRecords.map((record) => ({ ...record, owner: opponent?.name ?? "Opponent", name: opponent?.name ?? "Opponent" }))]
-        .sort((a, b) => b.createdAt - a.createdAt),
-    [records, opponentRecords, me, opponent]
-  );
+  const mergedRecords = useMemo(() => {
+    const allRecords = [...records, ...opponentRecords];
+    const seen = new Map<string, GuessRecord & { owner: string; name: string }>();
+    allRecords.forEach((record) => {
+      if (seen.has(record.id)) {
+        return;
+      }
+      const owner = record.ownerUid === uid ? "You" : record.ownerName ?? opponent?.name ?? "Opponent";
+      const name = record.ownerUid === uid ? me?.name ?? "You" : record.ownerName ?? opponent?.name ?? "Opponent";
+      seen.set(record.id, { ...record, owner, name });
+    });
+    return Array.from(seen.values()).sort((a, b) => b.createdAt - a.createdAt);
+  }, [records, opponentRecords, me, opponent, uid]);
 
   const players = room.playerOrder.map((id) => room.players[id]);
   const opponentId = room.playerOrder.find((id) => id !== uid);

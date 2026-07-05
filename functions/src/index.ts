@@ -316,6 +316,8 @@ export const submitGuess = onCall(async (request) => {
   const record: GuessRecord = {
     id,
     guess,
+    ownerUid: uid,
+    ownerName: room.players[uid].name,
     ...clue,
     createdAt: Date.now(),
     round: room.round
