@@ -645,7 +645,7 @@ function History({ myRecords, opponentRecords, opponentName, meName }: {
   meName: string;
 }) {
   return (
-    <div className="glass rounded-2xl p-4 h-full min-h-0 max-h-[calc(100vh-26rem)] overflow-auto">
+    <div className="glass rounded-2xl p-4 h-full min-h-0 overflow-auto max-h-[calc(100vh-28rem)] sm:max-h-none">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-xl font-black">Guess Log</h2>
@@ -820,7 +820,7 @@ function GamePanel({
   }
 
   return (
-    <div className="glass relative min-h-[60vh] sm:min-h-[calc(100vh-16rem)] flex flex-col gap-4 rounded-2xl p-5 pb-32">
+    <div className="glass relative min-h-[60vh] sm:min-h-[calc(100vh-16rem)] flex flex-col gap-4 rounded-2xl p-5 pb-32 overflow-hidden">
       <div className="grid gap-5 pb-28 sm:pb-0">
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
           <div>
@@ -849,16 +849,16 @@ function GamePanel({
         ) : null}
       </div>
 
-      <div className="flex-1 min-h-0">
+      <div className="flex-1 min-h-0 overflow-hidden">
         <History myRecords={myRecords} opponentRecords={opponentRecords} opponentName={opponentRecords[0]?.name ?? "Opponent"} meName={myRecords[0]?.name ?? "You"} />
       </div>
 
-      <div className="fixed inset-x-0 bottom-0 z-20 bg-slate-950/95 px-4 py-4 backdrop-blur light:bg-white/95 sm:static sm:bg-transparent sm:px-0 sm:py-0">
+      <div className="fixed inset-x-0 bottom-0 z-20 bg-slate-950/95 px-3 pb-3 pt-2 backdrop-blur light:bg-white/95 sm:static sm:bg-transparent sm:px-0 sm:py-0">
         {room.status === "finished" ? (
           role === "player" ? (
             <div className="grid gap-3 sm:grid-cols-[1fr_auto_auto]">
               <input
-                className="focus-ring rounded-full border border-white/12 bg-white/8 px-4 py-3 font-mono text-xl font-black light:border-slate-900/10 light:bg-white/80"
+                className="focus-ring rounded-full border border-white/12 bg-white/8 px-4 py-3 text-sm font-mono font-black light:border-slate-900/10 light:bg-white/80"
                 value={rematchSecret}
                 onChange={(e) => setRematchSecret(e.target.value.replace(/\D/g, "").slice(0, room.settings.numberLength))}
                 placeholder="New secret"
@@ -876,14 +876,14 @@ function GamePanel({
           <form onSubmit={submitGuess} className="space-y-4">
             <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
               <input
-                className="focus-ring min-h-16 rounded-full border border-white/12 bg-black/22 px-5 text-center font-mono text-3xl font-black tracking-[0.25em] text-white placeholder:tracking-normal placeholder:text-slate-600 disabled:opacity-50 light:border-slate-900/10 light:bg-white/75 light:text-slate-950"
+                className="focus-ring min-h-14 rounded-full border border-white/12 bg-black/22 px-4 text-center font-mono text-2xl font-black tracking-[0.2em] text-white placeholder:tracking-normal placeholder:text-slate-600 disabled:opacity-50 light:border-slate-900/10 light:bg-white/75 light:text-slate-950"
                 value={guess}
                 onChange={(e) => setGuess(e.target.value.replace(/\D/g, "").slice(0, room.settings.numberLength))}
                 placeholder={"0".repeat(room.settings.numberLength)}
                 inputMode="numeric"
                 disabled={!canGuess || busy}
               />
-              <Button type="submit" disabled={!canGuess || busy || !!guessError || guess.length !== room.settings.numberLength}>
+              <Button type="submit" className="text-sm" disabled={!canGuess || busy || !!guessError || guess.length !== room.settings.numberLength}>
                 {busy ? <Loader2 className="animate-spin" size={18} /> : <Send size={18} />} Guess
               </Button>
             </div>
@@ -1030,7 +1030,7 @@ function RoomView({
   return (
     <>
       <RoomHeader room={room} latency={latency} onExit={onExit} />
-      <main className="mx-auto grid w-full max-w-7xl gap-4 px-4 py-6 sm:px-6 lg:grid-cols-[0.8fr_1.2fr] lg:px-8">
+      <main className="mx-auto grid w-full max-w-7xl gap-4 px-4 py-6 pb-32 sm:px-6 lg:grid-cols-[0.8fr_1.2fr] lg:px-8">
         <section className="space-y-4">
           <div className="glass rounded-2xl p-4">
             <div className="mb-4 flex items-center justify-between">
