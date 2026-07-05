@@ -1,0 +1,49 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "publicRooms": {
+      "$roomCode": {
+        ".read": "auth != null",
+        ".write": "auth != null"
+      }
+    },
+    "playerRooms": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": false
+      }
+    },
+    "playerData": {
+      "$uid": {
+        "$roomCode": {
+          ".read": "auth != null && auth.uid === $uid",
+          "secret": {
+            ".write": "auth != null && auth.uid === $uid"
+          },
+          "inbox": {
+            ".write": "auth != null && root.child('publicRooms').child($roomCode).child('players').child(auth.uid).exists()"
+          },
+          "history": {
+            ".write": "auth != null && root.child('publicRooms').child($roomCode).child('players').child(auth.uid).exists()"
+          }
+        }
+      }
+    },
+    "presence": {
+      "$roomCode": {
+        "$uid": {
+          ".read": "auth != null",
+          ".write": "auth != null && auth.uid === $uid",
+          ".validate": "newData.hasChildren(['online', 'lastSeen'])"
+        }
+      }
+    },
+    "privateRooms": {
+      "$roomCode": {
+        ".read": false,
+        ".write": false
+      }
+    }
+  }
+}
