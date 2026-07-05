@@ -585,10 +585,11 @@ function PlayerTile({
   );
 }
 
-function History({ myRecords, opponentRecords, opponentName }: {
+function History({ myRecords, opponentRecords, opponentName, meName }: {
   myRecords: Array<GuessRecord & { owner: string; name: string }>;
   opponentRecords: Array<GuessRecord & { owner: string; name: string }>;
   opponentName: string;
+  meName: string;
 }) {
   return (
     <div className="glass rounded-2xl p-4">
@@ -602,7 +603,7 @@ function History({ myRecords, opponentRecords, opponentName }: {
       <div className="grid gap-4 lg:grid-cols-2">
         <div className="space-y-3">
           <div className="flex items-center justify-between text-sm font-semibold uppercase tracking-[0.24em] text-slate-400 light:text-slate-600">
-            <span>You</span>
+            <span>{meName}</span>
             <span className="inline-flex rounded-full bg-cyan-500/10 px-2 py-1 text-[10px] uppercase tracking-[0.24em] text-cyan-200">Your guesses</span>
           </div>
           {myRecords.length === 0 ? (
@@ -847,7 +848,7 @@ function GamePanel({
         )}
       </div>
 
-      <History myRecords={myRecords} opponentRecords={opponentRecords} opponentName={opponentRecords[0]?.name ?? "Opponent"} />
+      <History myRecords={myRecords} opponentRecords={opponentRecords} opponentName={opponentRecords[0]?.name ?? "Opponent"} meName={myRecords[0]?.name ?? "You"} />
     </div>
   );
 }
@@ -927,7 +928,9 @@ function RoomView({
   const myRecords = useMemo(
     () =>
       allRecords
-        .filter((record) => record.ownerUid === uid)
+        .filter((record) =>
+          record.ownerUid ? record.ownerUid === uid : record.ownerName === me?.name
+        )
         .map((record) => ({
           ...record,
           owner: "You",
@@ -939,13 +942,15 @@ function RoomView({
   const opponentRecords = useMemo(
     () =>
       allRecords
-        .filter((record) => record.ownerUid !== uid)
+        .filter((record) =>
+          record.ownerUid ? record.ownerUid !== uid : record.ownerName !== me?.name
+        )
         .map((record) => ({
           ...record,
           owner: record.ownerName ?? opponent?.name ?? "Opponent",
           name: record.ownerName ?? opponent?.name ?? "Opponent"
         })),
-    [allRecords, opponent]
+    [allRecords, opponent, me, uid]
   );
 
   const players = room.playerOrder.map((id) => room.players[id]);
