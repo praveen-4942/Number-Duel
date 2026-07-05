@@ -324,14 +324,18 @@ export const api = {
     const clue = scoreGuess(secret, guess, room.settings.clueMode);
     const won = guess === secret;
     const historyId = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const record = {
+      id: historyId,
+      guess,
+      ownerUid: fromUid,
+      ownerName: room.players[fromUid]?.name ?? "Opponent",
+      ...clue,
+      createdAt: Date.now(),
+      round
+    };
     const updates: Record<string, unknown> = {
-      [`playerData/${fromUid}/${room.roomCode}/history/${historyId}`]: {
-        id: historyId,
-        guess,
-        ...clue,
-        createdAt: Date.now(),
-        round
-      },
+      [`playerData/${fromUid}/${room.roomCode}/history/${historyId}`]: record,
+      [`playerData/${uid}/${room.roomCode}/history/${historyId}`]: record,
       [`playerData/${uid}/${room.roomCode}/inbox/${pendingId}`]: null
     };
     if (won) {
