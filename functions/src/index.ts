@@ -323,7 +323,8 @@ export const submitGuess = onCall(async (request) => {
 
   const updates: Record<string, unknown> = {
     [`privateRooms/${roomCode}/expiresAt`]: Date.now() + ROOM_TTL_MS,
-    [`playerData/${uid}/${roomCode}/history/${id}`]: record
+    [`playerData/${uid}/${roomCode}/history/${id}`]: record,
+    [`playerData/${opponentUid}/${roomCode}/history/${id}`]: record
   };
 
   if (won) {
