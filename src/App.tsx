@@ -585,40 +585,88 @@ function PlayerTile({
   );
 }
 
-function History({ records }: { records: Array<GuessRecord & { owner: string; name: string }> }) {
+function History({ myRecords, opponentRecords, opponentName }: {
+  myRecords: Array<GuessRecord & { owner: string; name: string }>;
+  opponentRecords: Array<GuessRecord & { owner: string; name: string }>;
+  opponentName: string;
+}) {
   return (
     <div className="glass rounded-2xl p-4">
-      <div className="mb-4 flex items-center justify-between gap-3">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-xl font-black">Guess Log</h2>
-          <p className="text-sm text-slate-400 light:text-slate-600">Latest guesses from both players appear here.</p>
+          <p className="text-sm text-slate-400 light:text-slate-600">Both players’ guesses are shown side-by-side.</p>
         </div>
         <Clipboard className="text-cyan-200 light:text-cyan-700" size={20} />
       </div>
-      <div className="grid max-h-[420px] gap-2 overflow-auto pr-1">
-        {records.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-white/15 p-6 text-center text-sm font-semibold text-slate-400 light:border-slate-900/15">
-            No guesses yet. Play a round to see updates live.
+      <div className="grid gap-4 lg:grid-cols-2">
+        <div className="space-y-3">
+          <div className="flex items-center justify-between text-sm font-semibold uppercase tracking-[0.24em] text-slate-400 light:text-slate-600">
+            <span>You</span>
+            <span className="inline-flex rounded-full bg-cyan-500/10 px-2 py-1 text-[10px] uppercase tracking-[0.24em] text-cyan-200">Your guesses</span>
           </div>
-        ) : (
-          records.map((record) => (
-            <motion.div
-              key={record.id}
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="grid grid-cols-[auto_1fr] gap-3 rounded-lg border border-white/10 bg-white/6 p-3 light:border-slate-900/10 light:bg-white/70"
-            >
-              <div className="space-y-2">
-                <div className="font-mono text-xl font-black text-cyan-100 light:text-cyan-800">{record.guess}</div>
-                <div className="text-[10px] uppercase tracking-[0.26em] text-slate-300 light:text-slate-600">{record.owner}</div>
-              </div>
-              <div className="text-sm">
-                <div className="font-bold text-slate-100 light:text-slate-900">{clueLabel(record)}</div>
-                <div className="mt-1 text-xs text-slate-400 light:text-slate-600">Round {record.round}</div>
-              </div>
-            </motion.div>
-          ))
-        )}
+          {myRecords.length === 0 ? (
+            <div className="rounded-lg border border-dashed border-white/15 p-6 text-center text-sm font-semibold text-slate-400 light:border-slate-900/15">
+              No guesses yet from you.
+            </div>
+          ) : (
+            <div className="grid gap-2">
+              {myRecords.map((record) => (
+                <motion.div
+                  key={record.id}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="rounded-lg border border-white/10 bg-white/6 p-3 light:border-slate-900/10 light:bg-white/70"
+                >
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <div className="font-mono text-xl font-black text-cyan-100 light:text-cyan-800">{record.guess}</div>
+                      <div className="mt-2 inline-flex rounded-full bg-cyan-500/10 px-2 py-1 text-[10px] uppercase tracking-[0.2em] text-cyan-200">
+                        {record.owner}
+                      </div>
+                    </div>
+                    <div className="text-[10px] uppercase tracking-[0.26em] text-slate-300 light:text-slate-600">Round {record.round}</div>
+                  </div>
+                  <div className="mt-2 text-sm font-bold text-slate-100 light:text-slate-900">{clueLabel(record)}</div>
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="space-y-3">
+          <div className="flex items-center justify-between text-sm font-semibold uppercase tracking-[0.24em] text-slate-400 light:text-slate-600">
+            <span>{opponentName}</span>
+            <span className="inline-flex rounded-full bg-fuchsia-500/10 px-2 py-1 text-[10px] uppercase tracking-[0.24em] text-fuchsia-200">Their guesses</span>
+          </div>
+          {opponentRecords.length === 0 ? (
+            <div className="rounded-lg border border-dashed border-white/15 p-6 text-center text-sm font-semibold text-slate-400 light:border-slate-900/15">
+              No guesses yet from your opponent.
+            </div>
+          ) : (
+            <div className="grid gap-2">
+              {opponentRecords.map((record) => (
+                <motion.div
+                  key={record.id}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="rounded-lg border border-white/10 bg-white/6 p-3 light:border-slate-900/10 light:bg-white/70"
+                >
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <div className="font-mono text-xl font-black text-cyan-100 light:text-cyan-800">{record.guess}</div>
+                      <div className="mt-2 inline-flex rounded-full bg-fuchsia-500/10 px-2 py-1 text-[10px] uppercase tracking-[0.2em] text-fuchsia-200">
+                        {record.owner}
+                      </div>
+                    </div>
+                    <div className="text-[10px] uppercase tracking-[0.26em] text-slate-300 light:text-slate-600">Round {record.round}</div>
+                  </div>
+                  <div className="mt-2 text-sm font-bold text-slate-100 light:text-slate-900">{clueLabel(record)}</div>
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -645,12 +693,14 @@ function Countdown({ room, active }: { room: PublicRoom; active: boolean }) {
 function GamePanel({
   room,
   uid,
-  records,
+  myRecords,
+  opponentRecords,
   role
 }: {
   room: PublicRoom;
   uid: string;
-  records: Array<GuessRecord & { owner: string; name: string }>;
+  myRecords: Array<GuessRecord & { owner: string; name: string }>;
+  opponentRecords: Array<GuessRecord & { owner: string; name: string }>;
   role: "player" | "spectator";
 }) {
   const [guess, setGuess] = useState("");
@@ -797,7 +847,7 @@ function GamePanel({
         )}
       </div>
 
-      <History records={records} />
+      <History myRecords={myRecords} opponentRecords={opponentRecords} opponentName={opponentRecords[0]?.name ?? "Opponent"} />
     </div>
   );
 }
@@ -863,21 +913,23 @@ function RoomView({
   onExit: () => void;
 }) {
   const [sound, setSound] = useState(true);
-  const records = useMemo(() => orderedHistory(history), [history]);
-  const opponentRecords = useMemo(() => orderedHistory(opponentHistory), [opponentHistory]);
-  const mergedRecords = useMemo(() => {
-    const allRecords = [...records, ...opponentRecords];
-    const seen = new Map<string, GuessRecord & { owner: string; name: string }>();
-    allRecords.forEach((record) => {
-      if (seen.has(record.id)) {
-        return;
-      }
-      const owner = record.ownerUid === uid ? "You" : record.ownerName ?? opponent?.name ?? "Opponent";
-      const name = record.ownerUid === uid ? me?.name ?? "You" : record.ownerName ?? opponent?.name ?? "Opponent";
-      seen.set(record.id, { ...record, owner, name });
-    });
-    return Array.from(seen.values()).sort((a, b) => b.createdAt - a.createdAt);
-  }, [records, opponentRecords, me, opponent, uid]);
+  const myRecords = useMemo(() =>
+    orderedHistory(history).map((record) => ({
+      ...record,
+      owner: record.ownerUid === uid ? "You" : me?.name ?? "You",
+      name: record.ownerUid === uid ? me?.name ?? "You" : me?.name ?? "You"
+    })),
+    [history, me, uid]
+  );
+
+  const opponentRecords = useMemo(() =>
+    orderedHistory(opponentHistory).map((record) => ({
+      ...record,
+      owner: record.ownerUid === uid ? "You" : record.ownerName ?? opponent?.name ?? "Opponent",
+      name: record.ownerUid === uid ? me?.name ?? "You" : record.ownerName ?? opponent?.name ?? "Opponent"
+    })),
+    [opponentHistory, opponent, me, uid]
+  );
 
   const players = room.playerOrder.map((id) => room.players[id]);
   const opponentId = room.playerOrder.find((id) => id !== uid);
@@ -952,7 +1004,7 @@ function RoomView({
           </div>
         </section>
 
-        <GamePanel room={room} uid={uid} records={mergedRecords} role={role} />
+        <GamePanel room={room} uid={uid} myRecords={myRecords} opponentRecords={opponentRecords} role={role} />
       </main>
       <FloatingReactions room={room} />
     </>
