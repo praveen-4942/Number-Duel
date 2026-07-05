@@ -137,6 +137,11 @@ function Shell({ children }: { children: React.ReactNode }) {
         {light ? <Moon size={18} /> : <Sun size={18} />}
       </motion.button>
       {children}
+      <div className="pointer-events-none fixed inset-x-0 bottom-0 z-50 flex justify-center pb-4">
+        <div className="rounded-full border border-white/15 bg-slate-950/80 px-4 py-2 text-xs font-semibold text-slate-100 shadow-[0_0_30px_rgba(0,0,0,0.14)] backdrop-blur light:border-slate-200/70 light:bg-white/85 light:text-slate-800">
+          Created by Praveenkumar G 2026
+        </div>
+      </div>
     </div>
   );
 }

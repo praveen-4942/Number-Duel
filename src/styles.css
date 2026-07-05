@@ -15,6 +15,11 @@
 
 .light {
   color-scheme: light;
+  color: #0f172a;
+  background: radial-gradient(circle at 16% 12%, rgba(0, 181, 216, 0.18), transparent 28%),
+    radial-gradient(circle at 86% 16%, rgba(217, 70, 239, 0.16), transparent 27%),
+    radial-gradient(circle at 50% 92%, rgba(245, 158, 11, 0.14), transparent 35%),
+    linear-gradient(135deg, #f8fbff 0%, #eef2ff 54%, #fff7ed 100%);
 }
 
 body {
@@ -22,6 +27,10 @@ body {
   min-width: 320px;
   min-height: 100vh;
   overflow-x: hidden;
+  background: transparent;
+}
+
+.light body {
   background: transparent;
 }
 
@@ -41,10 +50,17 @@ select {
 
 .light .aurora {
   background:
-    radial-gradient(circle at 16% 12%, rgba(0, 181, 216, 0.18), transparent 28%),
-    radial-gradient(circle at 86% 16%, rgba(217, 70, 239, 0.16), transparent 27%),
-    radial-gradient(circle at 50% 92%, rgba(245, 158, 11, 0.14), transparent 35%),
+    radial-gradient(circle at 16% 12%, rgba(0, 181, 216, 0.14), transparent 30%),
+    radial-gradient(circle at 86% 16%, rgba(217, 70, 239, 0.12), transparent 30%),
+    radial-gradient(circle at 50% 92%, rgba(245, 158, 11, 0.12), transparent 36%),
     linear-gradient(135deg, #f8fbff 0%, #eef2ff 52%, #fff7ed 100%);
+}
+
+.light .grid-mask {
+  background-image:
+    linear-gradient(rgba(148, 163, 184, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 163, 184, 0.08) 1px, transparent 1px);
+  mask-image: linear-gradient(to bottom, rgba(255,255,255,0.95), transparent 90%);
 }
 
 .grid-mask {
@@ -63,9 +79,9 @@ select {
 }
 
 .light .glass {
-  border-color: rgba(15, 23, 42, 0.12);
-  background: rgba(255, 255, 255, 0.72);
-  box-shadow: 0 24px 70px rgba(79, 70, 229, 0.14);
+  border-color: rgba(148, 163, 184, 0.16);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 30px 90px rgba(148, 163, 184, 0.12);
 }
 
 .neon-text {
