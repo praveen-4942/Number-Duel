@@ -7,6 +7,7 @@ export function useRoom(uid?: string, initialRoomCode?: string) {
   const [roomCode, setRoomCode] = useState(initialRoomCode ?? "");
   const [room, setRoom] = useState<PublicRoom | null>(null);
   const [history, setHistory] = useState<Record<string, GuessRecord>>({});
+  const [opponentHistory, setOpponentHistory] = useState<Record<string, GuessRecord>>({});
   const [inbox, setInbox] = useState<Record<string, PendingGuess>>({});
   const [presence, setPresence] = useState<Record<string, { online: boolean; lastSeen: number }>>({});
   const [role, setRole] = useState<Role>("player");
@@ -89,5 +90,20 @@ export function useRoom(uid?: string, initialRoomCode?: string) {
     return opponentUid ? room.players?.[opponentUid] : undefined;
   }, [room, uid]);
 
-  return { roomCode, setRoomCode, room, history, presence, me, opponent, role, latency };
+  useEffect(() => {
+    if (!uid || !room || !room.playerOrder || room.playerOrder.length < 2 || !database) {
+      setOpponentHistory({});
+      return;
+    }
+    const opponentUid = room.playerOrder.find((id) => id !== uid);
+    if (!opponentUid) {
+      setOpponentHistory({});
+      return;
+    }
+    const opponentHistoryRef = ref(database, `playerData/${opponentUid}/${room.roomCode}/history`);
+    const unsubscribe = onValue(opponentHistoryRef, (snap) => setOpponentHistory(snap.val() ?? {}));
+    return () => unsubscribe();
+  }, [uid, room]);
+
+  return { roomCode, setRoomCode, room, history, opponentHistory, presence, me, opponent, role, latency };
 }

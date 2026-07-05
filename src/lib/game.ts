@@ -25,7 +25,7 @@ export function generateSecret(length: number) {
 }
 
 export function orderedHistory(history?: Record<string, GuessRecord>) {
-  return Object.values(history ?? {}).sort((a, b) => a.createdAt - b.createdAt);
+  return Object.values(history ?? {}).sort((a, b) => b.createdAt - a.createdAt);
 }
 
 export function clueLabel(record: GuessRecord) {

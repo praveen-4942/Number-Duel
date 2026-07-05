@@ -469,6 +469,7 @@ function RoomHeader({
   latency: number | null;
   onExit: () => void;
 }) {
+  const [detailsOpen, setDetailsOpen] = useState(false);
   async function copyCode() {
     await navigator.clipboard.writeText(room.roomCode);
     playTone("tap");
@@ -485,30 +486,58 @@ function RoomHeader({
   }
 
   return (
-    <header className="glass sticky top-3 z-30 mx-auto mt-3 flex w-[calc(100%-1.5rem)] max-w-7xl flex-wrap items-center justify-between gap-3 rounded-2xl px-4 py-3">
-      <div className="flex items-center gap-3">
-        <div className="rounded-lg bg-cyan-300 p-2 text-slate-950 shadow-glow">
-          <Gamepad2 size={22} />
+    <header className="glass sticky top-3 z-30 mx-auto mt-3 w-[calc(100%-1.5rem)] max-w-7xl rounded-2xl px-4 py-3">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="rounded-lg bg-cyan-300 p-2 text-slate-950 shadow-glow">
+            <Gamepad2 size={22} />
+          </div>
+          <div>
+            <div className="text-xs font-bold uppercase tracking-[0.28em] text-slate-400 light:text-slate-600">Duel Info</div>
+            <div className="text-lg font-black text-white">Room details are hidden</div>
+          </div>
         </div>
-        <div>
-          <div className="text-xs font-bold uppercase tracking-[0.28em] text-slate-400 light:text-slate-600">Room Code</div>
-          <div className="font-mono text-2xl font-black tracking-[0.2em]">{room.roomCode}</div>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button type="button" variant="ghost" onClick={() => setDetailsOpen((value) => !value)}>
+            {detailsOpen ? "Hide details" : "Show details"}
+          </Button>
+          <Button type="button" variant="danger" onClick={onExit}>
+            <DoorOpen size={17} /> Exit
+          </Button>
         </div>
       </div>
-      <div className="flex flex-wrap items-center gap-2">
-        <div className="inline-flex items-center gap-2 rounded-lg border border-emerald-300/25 bg-emerald-300/10 px-3 py-2 text-sm font-bold text-emerald-200 light:text-emerald-700">
-          <Wifi size={16} /> {latency ?? "--"} ms
-        </div>
-        <Button type="button" variant="ghost" onClick={copyCode}>
-          <Copy size={17} /> Copy
-        </Button>
-        <Button type="button" variant="ghost" onClick={shareRoom}>
-          <Share2 size={17} /> Share
-        </Button>
-        <Button type="button" variant="danger" onClick={onExit}>
-          <DoorOpen size={17} /> Exit
-        </Button>
-      </div>
+
+      <AnimatePresence>
+        {detailsOpen ? (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="mt-4 overflow-hidden"
+          >
+            <div className="grid gap-3 rounded-2xl border border-white/10 bg-white/5 p-4 light:bg-white/90 light:border-slate-200/60">
+              <div className="grid gap-1">
+                <div className="text-xs font-bold uppercase tracking-[0.18em] text-slate-400 light:text-slate-600">Room Code</div>
+                <div className="font-mono text-2xl font-black tracking-[0.2em] text-white light:text-slate-950">{room.roomCode}</div>
+              </div>
+              <div className="grid gap-2 sm:grid-cols-2">
+                <div className="rounded-2xl bg-black/10 p-3 light:bg-slate-100">
+                  <div className="text-xs uppercase tracking-[0.18em] text-slate-500 light:text-slate-600">Latency</div>
+                  <div className="font-black text-white light:text-slate-950">{latency ?? "--"} ms</div>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <Button type="button" variant="ghost" onClick={copyCode}>
+                    <Copy size={17} /> Copy
+                  </Button>
+                  <Button type="button" variant="ghost" onClick={shareRoom}>
+                    <Share2 size={17} /> Share
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
     </header>
   );
 }
@@ -556,30 +585,36 @@ function PlayerTile({
   );
 }
 
-function History({ records }: { records: GuessRecord[] }) {
+function History({ records }: { records: Array<GuessRecord & { owner: string; name: string }> }) {
   return (
     <div className="glass rounded-2xl p-4">
-      <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-xl font-black">Your Guess History</h2>
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <div>
+          <h2 className="text-xl font-black">Guess Log</h2>
+          <p className="text-sm text-slate-400 light:text-slate-600">Latest guesses from both players appear here.</p>
+        </div>
         <Clipboard className="text-cyan-200 light:text-cyan-700" size={20} />
       </div>
       <div className="grid max-h-[420px] gap-2 overflow-auto pr-1">
         {records.length === 0 ? (
           <div className="rounded-lg border border-dashed border-white/15 p-6 text-center text-sm font-semibold text-slate-400 light:border-slate-900/15">
-            Your guesses appear here. Opponent guesses stay hidden.
+            No guesses yet. Play a round to see updates live.
           </div>
         ) : (
           records.map((record) => (
             <motion.div
-              key={record.id}
+              key={`${record.owner}-${record.id}`}
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               className="grid grid-cols-[auto_1fr] gap-3 rounded-lg border border-white/10 bg-white/6 p-3 light:border-slate-900/10 light:bg-white/70"
             >
-              <div className="font-mono text-xl font-black text-cyan-100 light:text-cyan-800">{record.guess}</div>
+              <div className="space-y-2">
+                <div className="font-mono text-xl font-black text-cyan-100 light:text-cyan-800">{record.guess}</div>
+                <div className="text-[10px] uppercase tracking-[0.26em] text-slate-400 light:text-slate-600">{record.owner}</div>
+              </div>
               <div className="text-sm">
-                <div className="font-bold">{clueLabel(record)}</div>
-                <div className="text-xs text-slate-400 light:text-slate-600">Round {record.round}</div>
+                <div className="font-bold text-slate-950 light:text-slate-900">{clueLabel(record)}</div>
+                <div className="mt-1 text-xs text-slate-400 light:text-slate-600">Round {record.round}</div>
               </div>
             </motion.div>
           ))
@@ -615,7 +650,7 @@ function GamePanel({
 }: {
   room: PublicRoom;
   uid: string;
-  records: GuessRecord[];
+  records: Array<GuessRecord & { owner: string; name: string }>;
   role: "player" | "spectator";
 }) {
   const [guess, setGuess] = useState("");
@@ -681,78 +716,86 @@ function GamePanel({
   }
 
   return (
-    <div className="glass rounded-2xl p-5">
-      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <div className="text-sm font-bold uppercase tracking-[0.22em] text-slate-400 light:text-slate-600">Round {room.round}</div>
-          <h2 className="text-2xl font-black">{room.status === "finished" ? "Duel complete" : canGuess ? "Your turn" : role === "spectator" ? "Spectating" : "Opponent turn"}</h2>
+    <div className="glass grid min-h-[calc(100vh-16rem)] grid-rows-[minmax(320px,1fr)_minmax(320px,1fr)] gap-4 rounded-2xl p-5">
+      <div className="grid gap-5">
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <div className="text-sm font-bold uppercase tracking-[0.22em] text-slate-400 light:text-slate-600">Round {room.round}</div>
+            <h2 className="text-2xl font-black">{room.status === "finished" ? "Duel complete" : canGuess ? "Your turn" : role === "spectator" ? "Spectating" : "Opponent turn"}</h2>
+          </div>
+          <Countdown room={room} active={canGuess} />
         </div>
-        <Countdown room={room} active={canGuess} />
-      </div>
 
-      {room.status === "finished" ? (
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
-          <div className="rounded-2xl border border-amber-300/25 bg-amber-300/10 p-5">
-            <div className="flex items-center gap-3 text-2xl font-black text-amber-100 light:text-amber-700">
-              <Trophy /> {room.players[room.winnerUid ?? ""]?.name ?? "A player"} wins
+        {room.status === "finished" ? (
+          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+            <div className="rounded-2xl border border-amber-300/25 bg-amber-300/10 p-5">
+              <div className="flex items-center gap-3 text-2xl font-black text-amber-100 light:text-amber-700">
+                <Trophy /> {room.players[room.winnerUid ?? ""]?.name ?? "A player"} wins
+              </div>
+              <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                {room.playerOrder.map((id) => (
+                  <div key={id} className="rounded-lg bg-black/20 p-3 light:bg-white/65">
+                    <div className="text-sm font-bold text-slate-400 light:text-slate-600">{room.players[id]?.name}</div>
+                    <div className="font-mono text-2xl font-black">{room.players[id]?.secret ?? "Hidden"}</div>
+                  </div>
+                ))}
+              </div>
             </div>
-            <div className="mt-4 grid gap-2 sm:grid-cols-2">
-              {room.playerOrder.map((id) => (
-                <div key={id} className="rounded-lg bg-black/20 p-3 light:bg-white/65">
-                  <div className="text-sm font-bold text-slate-400 light:text-slate-600">{room.players[id]?.name}</div>
-                  <div className="font-mono text-2xl font-black">{room.players[id]?.secret ?? "Hidden"}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-          {role === "player" ? (
-            <div className="grid gap-3 sm:grid-cols-[1fr_auto_auto]">
+            {role === "player" ? (
+              <div className="grid gap-3 sm:grid-cols-[1fr_auto_auto]">
+                <input
+                  className="focus-ring rounded-lg border border-white/12 bg-white/8 px-4 py-3 font-mono text-xl font-black light:border-slate-900/10 light:bg-white/80"
+                  value={rematchSecret}
+                  onChange={(e) => setRematchSecret(e.target.value.replace(/\D/g, "").slice(0, room.settings.numberLength))}
+                  placeholder="New secret"
+                  inputMode="numeric"
+                />
+                <Button type="button" variant="ghost" onClick={() => setRematchSecret(generateSecret(room.settings.numberLength))}>
+                  <Sparkles size={18} /> Random
+                </Button>
+                <Button type="button" onClick={rematch} disabled={busy}>
+                  <RefreshCcw size={18} /> Play Again
+                </Button>
+              </div>
+            ) : null}
+          </motion.div>
+        ) : (
+          <form onSubmit={submitGuess} className="space-y-4">
+            <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
               <input
-                className="focus-ring rounded-lg border border-white/12 bg-white/8 px-4 py-3 font-mono text-xl font-black light:border-slate-900/10 light:bg-white/80"
-                value={rematchSecret}
-                onChange={(e) => setRematchSecret(e.target.value.replace(/\D/g, "").slice(0, room.settings.numberLength))}
-                placeholder="New secret"
+                className="focus-ring min-h-16 rounded-lg border border-white/12 bg-black/22 px-5 text-center font-mono text-3xl font-black tracking-[0.25em] text-white placeholder:tracking-normal placeholder:text-slate-600 disabled:opacity-50 light:border-slate-900/10 light:bg-white/75 light:text-slate-950"
+                value={guess}
+                onChange={(e) => setGuess(e.target.value.replace(/\D/g, "").slice(0, room.settings.numberLength))}
+                placeholder={"0".repeat(room.settings.numberLength)}
                 inputMode="numeric"
+                disabled={!canGuess || busy}
               />
-              <Button type="button" variant="ghost" onClick={() => setRematchSecret(generateSecret(room.settings.numberLength))}>
-                <Sparkles size={18} /> Random
-              </Button>
-              <Button type="button" onClick={rematch} disabled={busy}>
-                <RefreshCcw size={18} /> Play Again
+              <Button type="submit" disabled={!canGuess || busy || !!guessError || guess.length !== room.settings.numberLength}>
+                {busy ? <Loader2 className="animate-spin" size={18} /> : <Send size={18} />} Guess
               </Button>
             </div>
-          ) : null}
-        </motion.div>
-      ) : (
-        <form onSubmit={submitGuess} className="space-y-4">
-          <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
-            <input
-              className="focus-ring min-h-16 rounded-lg border border-white/12 bg-black/22 px-5 text-center font-mono text-3xl font-black tracking-[0.25em] text-white placeholder:tracking-normal placeholder:text-slate-600 disabled:opacity-50 light:border-slate-900/10 light:bg-white/75 light:text-slate-950"
-              value={guess}
-              onChange={(e) => setGuess(e.target.value.replace(/\D/g, "").slice(0, room.settings.numberLength))}
-              placeholder={"0".repeat(room.settings.numberLength)}
-              inputMode="numeric"
-              disabled={!canGuess || busy}
-            />
-            <Button type="submit" disabled={!canGuess || busy || !!guessError || guess.length !== room.settings.numberLength}>
-              {busy ? <Loader2 className="animate-spin" size={18} /> : <Send size={18} />} Guess
-            </Button>
-          </div>
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="text-sm font-semibold text-slate-400 light:text-slate-600">
-              {room.settings.clueMode === "classic" ? "Classic: Correct Positions only" : room.settings.clueMode === "advanced" ? "Advanced: Correct Digits and Correct Positions" : "Bulls & Cows: Bulls are exact, cows are wrong-position digits"}
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="text-sm font-semibold text-slate-400 light:text-slate-600">
+                {room.settings.clueMode === "classic"
+                  ? "Classic: Correct Positions only"
+                  : room.settings.clueMode === "advanced"
+                  ? "Advanced: Correct Digits and Correct Positions"
+                  : "Bulls & Cows: Bulls are exact, cows are wrong-position digits"}
+              </div>
+              <div className="flex gap-1">
+                {reactions.map((emoji) => (
+                  <button key={emoji} type="button" onClick={() => react(emoji)} className="focus-ring rounded-lg bg-white/8 px-2 py-1 text-xl transition hover:bg-white/15">
+                    {emoji}
+                  </button>
+                ))}
+              </div>
             </div>
-            <div className="flex gap-1">
-              {reactions.map((emoji) => (
-                <button key={emoji} type="button" onClick={() => react(emoji)} className="focus-ring rounded-lg bg-white/8 px-2 py-1 text-xl transition hover:bg-white/15">
-                  {emoji}
-                </button>
-              ))}
-            </div>
-          </div>
-          {error || guessError ? <div className="rounded-lg bg-rose-500/10 p-3 text-sm font-bold text-rose-200 light:text-rose-700">{error || guessError}</div> : null}
-        </form>
-      )}
+            {error || guessError ? (
+              <div className="rounded-lg bg-rose-500/10 p-3 text-sm font-bold text-rose-200 light:text-rose-700">{error || guessError}</div>
+            ) : null}
+          </form>
+        )}
+      </div>
 
       <History records={records} />
     </div>
@@ -760,15 +803,31 @@ function GamePanel({
 }
 
 function FloatingReactions({ room }: { room: PublicRoom }) {
-  const list = Object.entries(room.reactions ?? {}).slice(-8);
+  const [now, setNow] = useState(Date.now());
+
+  useEffect(() => {
+    const id = window.setInterval(() => setNow(Date.now()), 400);
+    return () => window.clearInterval(id);
+  }, []);
+
+  const list = useMemo(
+    () =>
+      Object.entries(room.reactions ?? {})
+        .map(([id, reaction]) => ({ id, reaction }))
+        .filter(({ reaction }) => reaction.createdAt > now - 4000)
+        .sort((a, b) => a.reaction.createdAt - b.reaction.createdAt)
+        .slice(-5),
+    [room.reactions, now]
+  );
+
   return (
     <div className="pointer-events-none fixed inset-x-0 bottom-8 z-40 flex justify-center">
       <AnimatePresence>
-        {list.map(([id, reaction], index) => (
+        {list.map(({ id, reaction }, index) => (
           <motion.div
             key={id}
             initial={{ opacity: 0, y: 30, scale: 0.8 }}
-            animate={{ opacity: 1, y: -index * 14, scale: 1 }}
+            animate={{ opacity: 1, y: -index * 18, scale: 1 }}
             exit={{ opacity: 0, y: -60 }}
             className="absolute rounded-full bg-white/12 px-4 py-2 text-3xl backdrop-blur"
           >
@@ -784,6 +843,9 @@ function RoomView({
   room,
   uid,
   history,
+  opponentHistory,
+  me,
+  opponent,
   presence,
   latency,
   role,
@@ -792,6 +854,9 @@ function RoomView({
   room: PublicRoom;
   uid: string;
   history: Record<string, GuessRecord>;
+  opponentHistory: Record<string, GuessRecord>;
+  me?: PublicPlayer;
+  opponent?: PublicPlayer;
   presence: Record<string, { online: boolean; lastSeen: number }>;
   latency: number | null;
   role: "player" | "spectator";
@@ -799,6 +864,15 @@ function RoomView({
 }) {
   const [sound, setSound] = useState(true);
   const records = useMemo(() => orderedHistory(history), [history]);
+  const opponentRecords = useMemo(() => orderedHistory(opponentHistory), [opponentHistory]);
+  const mergedRecords = useMemo(
+    () =>
+      [...records.map((record) => ({ ...record, owner: "You", name: me?.name ?? "You" })),
+      ...opponentRecords.map((record) => ({ ...record, owner: opponent?.name ?? "Opponent", name: opponent?.name ?? "Opponent" }))]
+        .sort((a, b) => b.createdAt - a.createdAt),
+    [records, opponentRecords, me, opponent]
+  );
+
   const players = room.playerOrder.map((id) => room.players[id]);
   const opponentId = room.playerOrder.find((id) => id !== uid);
   const opponentOffline = opponentId ? presence[opponentId]?.online === false : false;
@@ -872,7 +946,7 @@ function RoomView({
           </div>
         </section>
 
-        <GamePanel room={room} uid={uid} records={records} role={role} />
+        <GamePanel room={room} uid={uid} records={mergedRecords} role={role} />
       </main>
       <FloatingReactions room={room} />
     </>
@@ -882,7 +956,7 @@ function RoomView({
 export default function App() {
   const { user, loading, error } = useAuth();
   const [selectedRoom, setSelectedRoom] = useState("");
-  const { roomCode, setRoomCode, room, history, presence, latency, role } = useRoom(user?.uid, selectedRoom);
+  const { roomCode, setRoomCode, room, history, opponentHistory, presence, latency, role, me, opponent } = useRoom(user?.uid, selectedRoom);
 
   useEffect(() => {
     if (selectedRoom && selectedRoom !== roomCode) {
@@ -916,9 +990,12 @@ export default function App() {
           room={room}
           uid={user.uid}
           history={history}
+          opponentHistory={opponentHistory}
           presence={presence}
           latency={latency}
           role={role}
+          me={me}
+          opponent={opponent}
           onExit={exitRoom}
         />
       ) : (
