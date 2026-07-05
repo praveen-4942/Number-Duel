@@ -53,6 +53,20 @@ export function useRoom(uid?: string, initialRoomCode?: string) {
   }, [uid, roomCode]);
 
   useEffect(() => {
+    if (roomCode) {
+      return;
+    }
+
+    setRoom(null);
+    setHistory({});
+    setOpponentHistory({});
+    setInbox({});
+    setPresence({});
+    setLatency(null);
+    setRole("player");
+  }, [roomCode]);
+
+  useEffect(() => {
     if (!room || !uid || room.status !== "playing") {
       return;
     }

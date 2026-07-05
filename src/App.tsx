@@ -34,7 +34,7 @@ import type { ClueMode, GameSettings, GuessRecord, PublicPlayer, PublicRoom } fr
 
 const defaultSettings: GameSettings = {
   numberLength: 4,
-  clueMode: "bullsCows",
+  clueMode: "classic",
   timerSeconds: 45,
   allowSpectators: true
 };
@@ -218,7 +218,7 @@ function Home({
             </div>
             <div>
               <div className="text-xs uppercase tracking-[0.32em] text-cyan-300/80">Number Duel</div>
-              <div className="text-lg font-black text-white">Arena Menu</div>
+              <div className="text-lg font-black text-white light:text-slate-950">Arena Menu</div>
             </div>
           </div>
           <div className="flex flex-wrap gap-2 sm:justify-end">
@@ -231,7 +231,7 @@ function Home({
                 key={item.id}
                 type="button"
                 onClick={() => scrollToSection(item.id)}
-                className="focus-ring rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:border-cyan-300/40 hover:bg-white/10"
+                className="focus-ring rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white light:text-slate-950 transition hover:border-cyan-300/40 hover:bg-white/10"
               >
                 {item.label}
               </button>
@@ -252,7 +252,7 @@ function Home({
               <Radio size={16} /> Next-level number duels
             </div>
             <div className="space-y-5">
-              <h1 className="text-5xl font-black tracking-[-0.04em] text-white sm:text-6xl lg:text-7xl">
+              <h1 className="text-5xl font-black tracking-[-0.04em] text-white light:text-slate-950 sm:text-6xl lg:text-7xl">
                 Simplified arena launch.
               </h1>
               <p className="max-w-2xl text-lg leading-8 text-slate-300">
@@ -288,7 +288,7 @@ function Home({
           <div className="space-y-6">
             <div className="rounded-[2rem] border border-white/10 bg-slate-950/85 p-8 shadow-[0_30px_90px_rgba(2,26,57,0.35)]">
               <div className="text-sm uppercase tracking-[0.32em] text-cyan-300/70">Quick Start</div>
-              <h2 className="mt-3 text-3xl font-black text-white">Pick your path</h2>
+              <h2 className="mt-3 text-3xl font-black text-white light:text-slate-950">Pick your path</h2>
               <p className="mt-4 max-w-2xl text-slate-300">
                 Use the panel to create a new room, join an existing duel, or spectate a match. Keep the interface minimal and get into the game fast.
               </p>
@@ -296,11 +296,11 @@ function Home({
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="glass rounded-[2rem] p-6">
                 <div className="text-sm uppercase tracking-[0.28em] text-cyan-200/70">Ready in seconds</div>
-                <div className="mt-3 text-2xl font-black text-white">Fast entry</div>
+                <div className="mt-3 text-2xl font-black text-white light:text-slate-950">Fast entry</div>
               </div>
               <div className="glass rounded-[2rem] p-6">
                 <div className="text-sm uppercase tracking-[0.28em] text-cyan-200/70">Secure play</div>
-                <div className="mt-3 text-2xl font-black text-white">Server-validated secrets</div>
+                <div className="mt-3 text-2xl font-black text-white light:text-slate-950">Server-validated secrets</div>
               </div>
             </div>
           </div>
@@ -359,8 +359,7 @@ function Home({
                         value={settings.clueMode}
                         options={[
                           { label: "Classic", value: "classic" },
-                          { label: "Advanced", value: "advanced" },
-                          { label: "Bulls & Cows", value: "bullsCows" }
+                          { label: "Advanced", value: "advanced" }
                         ]}
                         onChange={(clueMode) => setSettings((current) => ({ ...current, clueMode }))}
                       />
@@ -400,6 +399,7 @@ function Home({
                     onChange={(e) => setSecret(e.target.value.replace(/\D/g, "").slice(0, settings.numberLength))}
                     inputMode="numeric"
                     autoComplete="off"
+                    maxLength={settings.numberLength}
                     error={secret ? secretError : ""}
                     required
                   />
@@ -422,34 +422,33 @@ function Home({
         <section id="rule-book" className="space-y-8">
           <div className="glass rounded-[2rem] border border-white/10 bg-slate-950/85 p-8 shadow-[0_30px_90px_rgba(2,26,57,0.35)]">
             <div className="text-sm uppercase tracking-[0.32em] text-cyan-300/70">Rule Book</div>
-            <h2 className="mt-3 text-3xl font-black text-white">All the rules</h2>
+            <h2 className="mt-3 text-3xl font-black text-white light:text-slate-950">All the rules</h2>
             <div className="mt-8 space-y-6 text-slate-300">
               <div>
-                <h3 className="text-xl font-bold text-white">Room Creation</h3>
+                <h3 className="text-xl font-bold text-white light:text-slate-950">Room Creation</h3>
                 <p className="mt-2 leading-7">Choose a name, select a unique secret number, and create a room. Secrets remain hidden on the server, and only safe game state is shared with your opponent.</p>
               </div>
               <div>
-                <h3 className="text-xl font-bold text-white">Joining & Spectating</h3>
+                <h3 className="text-xl font-bold text-white light:text-slate-950">Joining & Spectating</h3>
                 <p className="mt-2 leading-7">Enter a room code to join as a player. If spectating is enabled, watch live matches without revealing secrets or histories.</p>
               </div>
               <div>
-                <h3 className="text-xl font-bold text-white">Clue Modes</h3>
+                <h3 className="text-xl font-bold text-white light:text-slate-950">Clue Modes</h3>
                 <ul className="mt-3 list-disc space-y-2 pl-5 leading-7 text-slate-300">
-                  <li><span className="font-semibold text-white">Classic:</span> only correct digits in the correct position are shown.</li>
-                  <li><span className="font-semibold text-white">Advanced:</span> both correct digits and correct positions are reported.</li>
-                  <li><span className="font-semibold text-white">Bulls & Cows:</span> bulls and cows are reported separately.</li>
+                  <li><span className="font-semibold text-white light:text-slate-950">Classic:</span> only correct digits in the correct position are shown.</li>
+                  <li><span className="font-semibold text-white light:text-slate-950">Advanced:</span> both correct digits and correct positions are reported.</li>
                 </ul>
               </div>
               <div>
-                <h3 className="text-xl font-bold text-white">Turn Flow</h3>
+                <h3 className="text-xl font-bold text-white light:text-slate-950">Turn Flow</h3>
                 <p className="mt-2 leading-7">Players take alternating turns. Each guess is evaluated server-side, and the resulting clue is revealed to the guesser.</p>
               </div>
               <div>
-                <h3 className="text-xl font-bold text-white">Winning</h3>
+                <h3 className="text-xl font-bold text-white light:text-slate-950">Winning</h3>
                 <p className="mt-2 leading-7">The first player to correctly guess the opponent’s secret number wins the duel. After completion, players may request a rematch to begin a new game.</p>
               </div>
               <div>
-                <h3 className="text-xl font-bold text-white">Reconnect Safety</h3>
+                <h3 className="text-xl font-bold text-white light:text-slate-950">Reconnect Safety</h3>
                 <p className="mt-2 leading-7">Disconnects are handled gracefully with a 60-second reconnect window. Player secrets remain protected regardless of connection state.</p>
               </div>
             </div>
@@ -494,7 +493,7 @@ function RoomHeader({
           </div>
           <div>
             <div className="text-xs font-bold uppercase tracking-[0.28em] text-slate-400 light:text-slate-600">Duel Info</div>
-            <div className="text-lg font-black text-white">Room details are hidden</div>
+            <div className="text-lg font-black text-white light:text-slate-950">Room details are hidden</div>
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -592,7 +591,7 @@ function History({ myRecords, opponentRecords, opponentName, meName }: {
   meName: string;
 }) {
   return (
-    <div className="glass rounded-2xl p-4">
+    <div className="glass rounded-2xl p-4 overflow-auto h-full">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-xl font-black">Guess Log</h2>
@@ -600,7 +599,7 @@ function History({ myRecords, opponentRecords, opponentName, meName }: {
         </div>
         <Clipboard className="text-cyan-200 light:text-cyan-700" size={20} />
       </div>
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-4 grid-cols-2">
         <div className="space-y-3">
           <div className="flex items-center justify-between text-sm font-semibold uppercase tracking-[0.24em] text-slate-400 light:text-slate-600">
             <span>{meName}</span>
@@ -676,7 +675,7 @@ function History({ myRecords, opponentRecords, opponentName, meName }: {
 function Countdown({ room, active }: { room: PublicRoom; active: boolean }) {
   const [now, setNow] = useState(Date.now());
   useEffect(() => {
-    const id = window.setInterval(() => setNow(Date.now()), 250);
+    const id = window.setInterval(() => setNow(Date.now()), 1000);
     return () => window.clearInterval(id);
   }, []);
   if (!room.settings.timerSeconds || !room.turnStartedAt || room.status !== "playing") {
@@ -767,8 +766,8 @@ function GamePanel({
   }
 
   return (
-    <div className="glass grid min-h-[calc(100vh-16rem)] grid-rows-[minmax(320px,1fr)_minmax(320px,1fr)] gap-4 rounded-2xl p-5">
-      <div className="grid gap-5">
+    <div className="glass relative min-h-[60vh] sm:min-h-[calc(100vh-16rem)] grid gap-4 rounded-2xl p-5">
+      <div className="grid gap-5 pb-28 sm:pb-0">
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
           <div>
             <div className="text-sm font-bold uppercase tracking-[0.22em] text-slate-400 light:text-slate-600">Round {room.round}</div>
@@ -792,29 +791,36 @@ function GamePanel({
                 ))}
               </div>
             </div>
-            {role === "player" ? (
-              <div className="grid gap-3 sm:grid-cols-[1fr_auto_auto]">
-                <input
-                  className="focus-ring rounded-lg border border-white/12 bg-white/8 px-4 py-3 font-mono text-xl font-black light:border-slate-900/10 light:bg-white/80"
-                  value={rematchSecret}
-                  onChange={(e) => setRematchSecret(e.target.value.replace(/\D/g, "").slice(0, room.settings.numberLength))}
-                  placeholder="New secret"
-                  inputMode="numeric"
-                />
-                <Button type="button" variant="ghost" onClick={() => setRematchSecret(generateSecret(room.settings.numberLength))}>
-                  <Sparkles size={18} /> Random
-                </Button>
-                <Button type="button" onClick={rematch} disabled={busy}>
-                  <RefreshCcw size={18} /> Play Again
-                </Button>
-              </div>
-            ) : null}
           </motion.div>
+        ) : null}
+      </div>
+
+      <History myRecords={myRecords} opponentRecords={opponentRecords} opponentName={opponentRecords[0]?.name ?? "Opponent"} meName={myRecords[0]?.name ?? "You"} />
+
+      <div className="fixed inset-x-0 bottom-0 z-20 bg-slate-950/95 px-4 py-4 backdrop-blur light:bg-white/95 sm:static sm:bg-transparent sm:px-0 sm:py-0">
+        {room.status === "finished" ? (
+          role === "player" ? (
+            <div className="grid gap-3 sm:grid-cols-[1fr_auto_auto]">
+              <input
+                className="focus-ring rounded-full border border-white/12 bg-white/8 px-4 py-3 font-mono text-xl font-black light:border-slate-900/10 light:bg-white/80"
+                value={rematchSecret}
+                onChange={(e) => setRematchSecret(e.target.value.replace(/\D/g, "").slice(0, room.settings.numberLength))}
+                placeholder="New secret"
+                inputMode="numeric"
+              />
+              <Button type="button" variant="ghost" onClick={() => setRematchSecret(generateSecret(room.settings.numberLength))}>
+                <Sparkles size={18} /> Random
+              </Button>
+              <Button type="button" onClick={rematch} disabled={busy}>
+                <RefreshCcw size={18} /> Play Again
+              </Button>
+            </div>
+          ) : null
         ) : (
           <form onSubmit={submitGuess} className="space-y-4">
             <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
               <input
-                className="focus-ring min-h-16 rounded-lg border border-white/12 bg-black/22 px-5 text-center font-mono text-3xl font-black tracking-[0.25em] text-white placeholder:tracking-normal placeholder:text-slate-600 disabled:opacity-50 light:border-slate-900/10 light:bg-white/75 light:text-slate-950"
+                className="focus-ring min-h-16 rounded-full border border-white/12 bg-black/22 px-5 text-center font-mono text-3xl font-black tracking-[0.25em] text-white placeholder:tracking-normal placeholder:text-slate-600 disabled:opacity-50 light:border-slate-900/10 light:bg-white/75 light:text-slate-950"
                 value={guess}
                 onChange={(e) => setGuess(e.target.value.replace(/\D/g, "").slice(0, room.settings.numberLength))}
                 placeholder={"0".repeat(room.settings.numberLength)}
@@ -847,8 +853,6 @@ function GamePanel({
           </form>
         )}
       </div>
-
-      <History myRecords={myRecords} opponentRecords={opponentRecords} opponentName={opponentRecords[0]?.name ?? "Opponent"} meName={myRecords[0]?.name ?? "You"} />
     </div>
   );
 }
@@ -857,7 +861,7 @@ function FloatingReactions({ room }: { room: PublicRoom }) {
   const [now, setNow] = useState(Date.now());
 
   useEffect(() => {
-    const id = window.setInterval(() => setNow(Date.now()), 400);
+    const id = window.setInterval(() => setNow(Date.now()), 1000);
     return () => window.clearInterval(id);
   }, []);
 
@@ -872,7 +876,7 @@ function FloatingReactions({ room }: { room: PublicRoom }) {
   );
 
   return (
-    <div className="pointer-events-none fixed inset-x-0 bottom-8 z-40 flex justify-center">
+    <div className="pointer-events-none fixed inset-x-0 bottom-8 z-40 hidden justify-center sm:flex">
       <AnimatePresence>
         {list.map(({ id, reaction }, index) => (
           <motion.div
@@ -1035,8 +1039,24 @@ function RoomView({
 
 export default function App() {
   const { user, loading, error } = useAuth();
-  const [selectedRoom, setSelectedRoom] = useState("");
+  const [selectedRoom, setSelectedRoom] = useState(() => {
+    if (typeof window === "undefined") {
+      return "";
+    }
+    return localStorage.getItem("selectedRoom") ?? "";
+  });
   const { roomCode, setRoomCode, room, history, opponentHistory, presence, latency, role, me, opponent } = useRoom(user?.uid, selectedRoom);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+    if (selectedRoom) {
+      localStorage.setItem("selectedRoom", selectedRoom);
+    } else {
+      localStorage.removeItem("selectedRoom");
+    }
+  }, [selectedRoom]);
 
   useEffect(() => {
     if (selectedRoom && selectedRoom !== roomCode) {
@@ -1050,6 +1070,9 @@ export default function App() {
     }
     setSelectedRoom("");
     setRoomCode("");
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("selectedRoom");
+    }
   }
 
   return (
