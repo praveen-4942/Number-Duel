@@ -54,9 +54,11 @@ function Button({
   return (
     <button
       className={cx(
-        "focus-ring inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-bold transition disabled:cursor-not-allowed disabled:opacity-50",
-        variant === "primary" && "bg-cyan-300 text-slate-950 shadow-glow hover:bg-cyan-200",
-        variant === "ghost" && "border border-white/15 bg-white/8 text-white hover:bg-white/14 light:border-slate-900/15 light:text-slate-900",
+        "focus-ring inline-flex min-h-11 items-center justify-center gap-2 rounded-3xl px-5 py-3 text-sm font-black uppercase tracking-[0.04em] transition-transform duration-200 disabled:cursor-not-allowed disabled:opacity-50",
+        variant === "primary" &&
+          "bg-gradient-to-r from-cyan-300 via-fuchsia-300 to-amber-300 text-slate-950 shadow-[0_0_40px_rgba(67,206,255,0.25)] hover:scale-[1.02] hover:shadow-[0_0_50px_rgba(236,72,153,0.3)]",
+        variant === "ghost" &&
+          "border border-white/20 bg-white/10 text-white hover:bg-white/15 light:border-slate-900/20 light:text-slate-900",
         variant === "danger" && "bg-rose-500 text-white hover:bg-rose-400",
         className
       )}
@@ -192,47 +194,66 @@ function Home({
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-7xl items-center px-4 py-20 sm:px-6 lg:px-8">
       <div className="grid w-full gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
-        <motion.section initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
-          <div className="inline-flex items-center gap-2 rounded-lg border border-cyan-300/30 bg-cyan-300/10 px-3 py-2 text-sm font-bold text-cyan-100 light:text-cyan-800">
+        <motion.section
+          initial={{ opacity: 0, scale: 0.96, y: 26 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.9, ease: "easeOut" }}
+          className="space-y-8"
+        >
+          <div className="inline-flex items-center gap-2 rounded-full border border-cyan-300/30 bg-cyan-300/10 px-4 py-2 text-sm font-bold text-cyan-100 shadow-[0_0_30px_rgba(45,232,255,0.18)] light:text-cyan-800">
             <Radio size={16} /> Real-time two-player duel
           </div>
           <div className="space-y-5">
             <h1 className="max-w-3xl text-5xl font-black tracking-normal sm:text-6xl lg:text-7xl">
-              Number <span className="neon-text">Duel</span>
+              <span className="block text-white">Number</span>
+              <span className="block text-6xl font-extrabold tracking-[-0.04em] text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-fuchsia-300 to-amber-300 sm:text-7xl lg:text-8xl">
+                Duel
+              </span>
             </h1>
             <p className="max-w-2xl text-lg leading-8 text-slate-300 light:text-slate-700">
-              Create a room, hide your number, and out-think your opponent with clues, tempo, and a little neon pressure.
+              Enter the arena, lock your secret code, and challenge another player in a glowing numbers battle.
             </p>
           </div>
-          <div className="grid gap-3 sm:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-3">
             {[
               { label: "Server scored", Icon: ShieldCheck },
               { label: "Private histories", Icon: Eye },
               { label: "60s reconnect", Icon: Wifi }
             ].map(({ label, Icon }) => (
-              <div key={label} className="glass rounded-lg p-4">
-                <Icon className="mb-3 text-cyan-200 light:text-cyan-700" size={22} />
-                <div className="font-bold">{label}</div>
-              </div>
+              <motion.div
+                key={label}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.55, ease: "easeOut" }}
+                className="glass rounded-3xl p-6 shadow-[0_25px_80px_rgba(3,236,255,0.12)]"
+              >
+                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-3xl bg-gradient-to-br from-cyan-400/25 to-fuchsia-400/15 text-cyan-200 shadow-[0_0_25px_rgba(67,206,255,0.24)]">
+                  <Icon size={22} />
+                </div>
+                <div className="text-lg font-black text-white">{label}</div>
+              </motion.div>
             ))}
           </div>
         </motion.section>
 
         <motion.form
-          initial={{ opacity: 0, scale: 0.98 }}
-          animate={{ opacity: 1, scale: 1 }}
+          initial={{ opacity: 0, scale: 0.95, y: 24 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.75, ease: "easeOut" }}
           onSubmit={submit}
-          className="glass rounded-2xl p-5 sm:p-6"
+          className="glass rounded-[2.5rem] border-cyan-300/20 p-5 shadow-[0_30px_90px_rgba(20,58,127,0.35)] sm:p-6"
         >
-          <div className="mb-5 grid grid-cols-3 gap-2 rounded-xl bg-black/20 p-1 light:bg-white/60">
+          <div className="mb-5 grid grid-cols-3 gap-2 rounded-[1.75rem] bg-black/20 p-1 shadow-[inset_0_0_1px_rgba(255,255,255,0.08)] light:bg-white/60">
             {(["create", "join", "spectate"] as const).map((item) => (
               <button
                 key={item}
                 type="button"
                 onClick={() => setTab(item)}
                 className={cx(
-                  "focus-ring rounded-lg px-3 py-2 text-sm font-black capitalize transition",
-                  tab === item ? "bg-white text-slate-950" : "text-slate-300 hover:bg-white/10 light:text-slate-700"
+                  "focus-ring rounded-[1.25rem] px-4 py-3 text-sm font-black uppercase tracking-[0.12em] transition duration-200",
+                  tab === item
+                    ? "bg-gradient-to-r from-cyan-300 via-fuchsia-300 to-amber-300 text-slate-950 shadow-[0_0_30px_rgba(67,206,255,0.2)]"
+                    : "text-slate-300 hover:bg-white/10 light:text-slate-700"
                 )}
               >
                 {item}
