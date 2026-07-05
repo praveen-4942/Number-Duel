@@ -202,6 +202,17 @@ export const api = {
     return { data: { roomCode } };
   },
 
+  async getRoomSettings(payload: { roomCode: string }) {
+    const db = requireDatabase();
+    const roomCode = payload.roomCode.trim().toUpperCase();
+    const snap = await get(ref(db, `publicRooms/${roomCode}`));
+    if (!snap.exists()) {
+      throw new Error("Room not found.");
+    }
+    const room = snap.val() as PublicRoom;
+    return { data: { numberLength: room.settings.numberLength, clueMode: room.settings.clueMode } };
+  },
+
   async submitGuess(payload: { roomCode: string; guess: string }) {
     const db = requireDatabase();
     const uid = requireCurrentUid();

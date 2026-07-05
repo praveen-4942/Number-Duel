@@ -9,6 +9,7 @@ import {
   DoorOpen,
   Eye,
   Gamepad2,
+  Menu,
   Loader2,
   Moon,
   Radio,
@@ -158,13 +159,56 @@ function Home({
   const [roomCode, setRoomCode] = useState("");
   const [secret, setSecret] = useState("");
   const [settings, setSettings] = useState<GameSettings>(defaultSettings);
+  const [joinRoomSettings, setJoinRoomSettings] = useState<Pick<GameSettings, "numberLength" | "clueMode"> | null>(null);
+  const [joinRoomFetchError, setJoinRoomFetchError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
-  const secretError = tab === "spectate" ? "" : validateNumber(secret, settings.numberLength);
+
+  const effectiveNumberLength = tab === "join" ? joinRoomSettings?.numberLength ?? settings.numberLength : settings.numberLength;
+  const effectiveClueMode = tab === "join" ? joinRoomSettings?.clueMode ?? settings.clueMode : settings.clueMode;
+  const secretError = tab === "spectate" ? "" : validateNumber(secret, effectiveNumberLength);
 
   useEffect(() => {
-    setSecret((value) => (value.length === settings.numberLength ? value : ""));
-  }, [settings.numberLength]);
+    setSecret((value) => (value.length === effectiveNumberLength ? value : ""));
+  }, [effectiveNumberLength]);
+
+  useEffect(() => {
+    if (tab !== "join") {
+      setJoinRoomSettings(null);
+      setJoinRoomFetchError("");
+      return;
+    }
+
+    if (roomCode.length !== 6) {
+      setJoinRoomSettings(null);
+      setJoinRoomFetchError("");
+      return;
+    }
+
+    let active = true;
+    setJoinRoomFetchError("");
+    api.getRoomSettings({ roomCode })
+      .then(({ data }) => {
+        if (!active) {
+          return;
+        }
+        setJoinRoomSettings({
+          numberLength: data.numberLength,
+          clueMode: data.clueMode
+        });
+      })
+      .catch((err) => {
+        if (!active) {
+          return;
+        }
+        setJoinRoomSettings(null);
+        setJoinRoomFetchError(err instanceof Error ? err.message : "Room not found.");
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [roomCode, tab]);
 
   async function submit(event: FormEvent) {
     event.preventDefault();
@@ -394,18 +438,28 @@ function Home({
               {tab !== "spectate" ? (
                 <div className="grid gap-3">
                   <Field
-                    label={`Secret number (${settings.numberLength} unique digits)`}
+                    label={`Secret number (${effectiveNumberLength} unique digits)`}
                     value={secret}
-                    onChange={(e) => setSecret(e.target.value.replace(/\D/g, "").slice(0, settings.numberLength))}
+                    onChange={(e) => setSecret(e.target.value.replace(/\D/g, "").slice(0, effectiveNumberLength))}
                     inputMode="numeric"
                     autoComplete="off"
-                    maxLength={settings.numberLength}
+                    maxLength={effectiveNumberLength}
                     error={secret ? secretError : ""}
                     required
                   />
-                  <Button type="button" variant="ghost" className="rounded-full" onClick={() => setSecret(generateSecret(settings.numberLength))}>
+                  <Button type="button" variant="ghost" className="rounded-full" onClick={() => setSecret(generateSecret(effectiveNumberLength))}>
                     <Sparkles size={18} /> Random
                   </Button>
+                  {tab === "join" && joinRoomSettings ? (
+                    <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-300 light:border-slate-900/10 light:bg-white/80 light:text-slate-900">
+                      Room expects {joinRoomSettings.numberLength} digits and uses {joinRoomSettings.clueMode === "classic" ? "Classic" : "Advanced"} clues.
+                    </div>
+                  ) : null}
+                  {tab === "join" && joinRoomFetchError ? (
+                    <div className="rounded-2xl border border-rose-300/30 bg-rose-500/10 px-4 py-3 text-sm font-semibold text-rose-200 light:text-rose-700">
+                      {joinRoomFetchError}
+                    </div>
+                  ) : null}
                 </div>
               ) : null}
 
@@ -498,7 +552,7 @@ function RoomHeader({
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <Button type="button" variant="ghost" onClick={() => setDetailsOpen((value) => !value)}>
-            {detailsOpen ? "Hide details" : "Show details"}
+            <Menu size={17} /> {detailsOpen ? "Hide details" : "Menu"}
           </Button>
           <Button type="button" variant="danger" onClick={onExit}>
             <DoorOpen size={17} /> Exit
@@ -591,7 +645,7 @@ function History({ myRecords, opponentRecords, opponentName, meName }: {
   meName: string;
 }) {
   return (
-    <div className="glass rounded-2xl p-4 overflow-auto h-full">
+    <div className="glass rounded-2xl p-4 h-full min-h-0 max-h-[calc(100vh-26rem)] overflow-auto">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-xl font-black">Guess Log</h2>
@@ -599,7 +653,7 @@ function History({ myRecords, opponentRecords, opponentName, meName }: {
         </div>
         <Clipboard className="text-cyan-200 light:text-cyan-700" size={20} />
       </div>
-      <div className="grid gap-4 grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-3">
           <div className="flex items-center justify-between text-sm font-semibold uppercase tracking-[0.24em] text-slate-400 light:text-slate-600">
             <span>{meName}</span>
@@ -766,7 +820,7 @@ function GamePanel({
   }
 
   return (
-    <div className="glass relative min-h-[60vh] sm:min-h-[calc(100vh-16rem)] grid gap-4 rounded-2xl p-5">
+    <div className="glass relative min-h-[60vh] sm:min-h-[calc(100vh-16rem)] flex flex-col gap-4 rounded-2xl p-5 pb-32">
       <div className="grid gap-5 pb-28 sm:pb-0">
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
           <div>
@@ -795,7 +849,9 @@ function GamePanel({
         ) : null}
       </div>
 
-      <History myRecords={myRecords} opponentRecords={opponentRecords} opponentName={opponentRecords[0]?.name ?? "Opponent"} meName={myRecords[0]?.name ?? "You"} />
+      <div className="flex-1 min-h-0">
+        <History myRecords={myRecords} opponentRecords={opponentRecords} opponentName={opponentRecords[0]?.name ?? "Opponent"} meName={myRecords[0]?.name ?? "You"} />
+      </div>
 
       <div className="fixed inset-x-0 bottom-0 z-20 bg-slate-950/95 px-4 py-4 backdrop-blur light:bg-white/95 sm:static sm:bg-transparent sm:px-0 sm:py-0">
         {room.status === "finished" ? (
